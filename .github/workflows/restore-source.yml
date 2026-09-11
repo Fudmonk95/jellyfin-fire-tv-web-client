@@ -1,5 +1,9 @@
-name: Restore complete Android source
+name: Restore and build Fire TV prototype
 on:
+  push:
+    paths:
+      - 'recovery/**'
+      - '.github/workflows/restore-source.yml'
   workflow_dispatch:
 permissions:
   contents: write
@@ -8,13 +12,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Import pinned upstream source
+      - name: Restore pinned source and TV changes
         run: |
           git remote add upstream https://github.com/jellyfin/jellyfin-android.git
           git fetch --depth=1 upstream 44a9a67a203a022546ebff7cb4963d4189a572db
-          git archive FETCH_HEAD | tar -x
+          git archive FETCH_HEAD | tar --exclude='.github/workflows' -x
+          python3 recovery/restore.py
+          node --check app/src/main/assets/native/TvNavigation.js
+          git diff --check
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "Restore complete Jellyfin Android source at 44a9a67"
+          git diff --cached --quiet || git commit -m "Restore complete upstream source and Fire TV prototype"
           git push origin HEAD:main
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Build APK
+        run: ./gradlew assembleLibreDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jellyfin-web-tv-debug
+          path: app/build/outputs/apk/libre/debug/*.apk
+          if-no-files-found: error
