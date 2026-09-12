@@ -1,0 +1,42 @@
+name: Publish test APK
+on:
+  push:
+    paths: ['.github/workflows/publish-test-apk.yml']
+  workflow_dispatch:
+permissions:
+  actions: read
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download existing successful build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: Fudmonk95/jellyfin-fire-tv-web-client
+        run: |
+          gh run download 34698142944 --name jellyfin-web-tv-battery-focus-fix --dir apk
+          python3 - <<'PY'
+          from pathlib import Path
+          import shutil
+          files = list(Path("apk").rglob("*.apk"))
+          if len(files) != 1:
+              raise RuntimeError("Expected exactly one APK")
+          shutil.copyfile(files[0], "jellyfin-web-tv.apk")
+          PY
+          sha256sum jellyfin-web-tv.apk > SHA256SUMS.txt
+      - name: Publish experimental release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: Fudmonk95/jellyfin-fire-tv-web-client
+        run: |
+          cat > notes.md <<'EOF'
+          Experimental Jellyfin Web TV test build, based on Jellyfin Android.
+          
+          Full server-provided web UI with remote navigation. This build skips the mobile battery optimisation prompt on TV devices and adds native snackbar action focus.
+          
+          Download jellyfin-web-tv.apk below directly using Downloader on Fire TV. No GitHub login or ZIP extraction required.
+          
+          This is the existing APK from successful build 34698142944, not a rebuild. Device compatibility, plugin behaviour and performance are still being tested. Debug-signed; a future build with a different signing key may require reinstalling.
+          EOF
+          gh release create v0.1.1-test jellyfin-web-tv.apk SHA256SUMS.txt --target 66855cb6053fe5496fb0e1619edc261d01354460 --prerelease --title "Jellyfin Web TV — battery and focus fix (test)" --notes-file notes.md
