@@ -11,4 +11,4 @@ Jellyfin-palvelimella voit:
 * Suoratoistaa Android-laitteisiin
 * Selata kokoelmaa helppokäyttöisessä käyttöliittymässä
 
-Tämä on virallinen Jellyfin-sovellus Androidille. Kiitos, kun käytät Jellyfiniä!
+Tämä on virallinen Jellyfin-sovellus Android TV:lle. Kiitos, kun käytät Jellyfiniä!

@@ -1,1 +1,1 @@
-Mobiilisovellus ilmaiselle Jellyfin-mediajärjestelmälle
+Televisiosovellus ilmaiselle Jellyfin-mediajärjestelmälle

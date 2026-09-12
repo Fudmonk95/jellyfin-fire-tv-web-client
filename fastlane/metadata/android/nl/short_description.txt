@@ -1,1 +1,1 @@
-Mobiele app voor Jellyfin, het vrije mediasysteem
+Televisie-app voor Jellyfin, het vrije mediasysteem

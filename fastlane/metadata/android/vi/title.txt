@@ -1,1 +1,1 @@
-Jellyfin
+Jellyfin dành cho Android TV

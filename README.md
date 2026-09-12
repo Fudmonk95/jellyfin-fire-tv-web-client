@@ -1,117 +1,37 @@
-# Jellyfin Web TV — experimental prototype
+# RenegadeFin
 
-Full server-provided Jellyfin Web interface with a Fire TV remote navigation layer.
-Plugin compatibility and performance are not yet device-tested. This is an unofficial
-fork of Jellyfin Android; its native player, authentication and server setup are retained.
-The app does not guarantee that all web plugins work.
+An experimental native Jellyfin client for Fire TV and Android TV. RenegadeFin replaces the earlier Jellyfin Web TV wrapper in this repository. It is an unofficial fork of Jellyfin for Android TV, based on stable v0.19.10 (`984181a3d6ab14e9a6d2dcc850c582e1c138bd95`).
 
-Recovered from the earlier prototype against upstream commit
-44a9a67a203a022546ebff7cb4963d4189a572db. D-pad/select handling is restored;
-Back uses the upstream handler. Additional media-key polish and input-field testing
-remain outstanding. No performance guarantee or stable release is claimed.
+![RenegadeFin](design/renegadefin/banner.svg)
 
-Build: JDK 17, Android SDK, then ./gradlew assembleLibreDebug.
-APK: app/build/outputs/apk/libre/debug/.
-The debug APK is for testing; CI debug signing keys may differ between builds.
+## In this preview
 
-Upstream documentation and license follow.
+- Native Compose home with horizontal shelves, featured artwork, bounded image requests and D-pad selection.
+- Charcoal, orange and amber design; original fin/flame/play mark; 16:9 Fire TV banner.
+- Upstream native playback, search, library browsing, subtitles and audio controls.
+- Manage profiles from Home: fresh administrator password confirmation, create separate Jellyfin users, enable/disable profiles, choose libraries and age ratings, select allowed/blocked tags and unrated categories, review changes, and verify saved policies.
+- Profiles are real Jellyfin users with separate watch history and server-enforced permissions. Bonfire is not required. Sign-in uses Jellyfin's normal authentication; a profile password is not a separate local PIN.
 
----
+This is not yet household sub-profiles under one account. A companion plugin for household delegation and a separate PIN flow is future work. The native profile editor currently requires a Jellyfin administrator. Administrator accounts cannot be edited through it. New profiles start disabled with no library access until an administrator configures and enables them. If creation is interrupted, check the Users page in Jellyfin before retrying.
 
-<h1 align="center">Jellyfin for Android</h1>
-<h3 align="center">Part of the <a href="https://jellyfin.org">Jellyfin Project</a></h3>
+## Install
 
----
+Download the RenegadeFin preview APK from this repository's Releases page and sideload it with Downloader. This uses a separate package from Jellyfin and the old web wrapper. Connect to your server and sign in. The profile icon switches accounts; Manage profiles edits restrictions after administrator confirmation.
 
-<p align="center">
-<img alt="Logo Banner" src="https://raw.githubusercontent.com/jellyfin/jellyfin-ux/master/branding/SVG/banner-logo-solid.svg?sanitize=true"/>
-<br/>
-<br/>
-<a href="https://github.com/jellyfin/jellyfin-android">
-<img alt="GPL 2.0 License" src="https://img.shields.io/github/license/jellyfin/jellyfin-android.svg"/>
-</a>
-<a href="https://github.com/jellyfin/jellyfin-android/releases">
-<img alt="Current Release" src="https://img.shields.io/github/release/jellyfin/jellyfin-android.svg"/>
-</a>
-<a href="https://translate.jellyfin.org/projects/jellyfin-android/jellyfin-android/">
-<img alt="Translation Status" src="https://translate.jellyfin.org/widgets/jellyfin-android/-/jellyfin-android/svg-badge.svg"/>
-</a>
-<br/>
-<a href="https://opencollective.com/jellyfin">
-<img alt="Donate" src="https://img.shields.io/opencollective/all/jellyfin.svg?label=backers"/>
-</a>
-<a href="https://features.jellyfin.org">
-<img alt="Feature Requests" src="https://img.shields.io/badge/fider-vote%20on%20features-success.svg"/>
-</a>
-<a href="https://matrix.to/#/+jellyfin:matrix.org">
-<img alt="Chat on Matrix" src="https://img.shields.io/matrix/jellyfin:matrix.org.svg?logo=matrix"/>
-</a>
-<a href="https://www.reddit.com/r/jellyfin/">
-<img alt="Join our Subreddit" src="https://img.shields.io/badge/reddit-r%2Fjellyfin-%23FF5700.svg"/>
-</a>
-<br/>
-<a href="https://play.google.com/store/apps/details?id=org.jellyfin.mobile">
-<img width="153" src="https://jellyfin.org/images/store-icons/google-play.png" alt="Jellyfin on Google Play"/>
-</a>
-<a href="https://www.amazon.com/gp/aw/d/B081RFTTQ9">
-<img width="153" src="https://jellyfin.org/images/store-icons/amazon.png" alt="Jellyfin on Amazon Appstore"/>
-</a>
-<a href="https://f-droid.org/en/packages/org.jellyfin.mobile/">
-<img width="153" src="https://jellyfin.org/images/store-icons/fdroid.png" alt="Jellyfin on F-Droid"/>
-</a>
-<br/>
-<a href="https://repo.jellyfin.org/releases/client/android/">Download archive</a>
-</p>
+APK builds are debug signed previews. Do not assume two CI builds have compatible signing keys. A production signing key and device testing are needed before a stable release.
 
-Jellyfin Mobile is an Android app that connects to Jellyfin instances and integrates with the [official web client](https://github.com/jellyfin/jellyfin-web).
-We welcome all contributions and pull requests! If you have a larger feature in mind please open an issue so we can discuss the implementation before you start.
-Even though the client is only a web wrapper there are still lots of improvements and bug fixes that can be accomplished with Android and Kotlin knowledge.
+## Compatibility and limits
 
-Most of the translations can be found in the [web client](https://translate.jellyfin.org/projects/jellyfin/jellyfin-web) since it's the base for the Android client as well. Translations for the app can also be improved very easily from our [Weblate](https://translate.jellyfin.org/projects/jellyfin-android/jellyfin-android) instance. Look through the following graphic to see if your native language could use some work!
+Server metadata plugins continue to provide their data through Jellyfin. Features needing client controls require explicit integration. Web-only themes, injected menus and CSS do not run in this native app. This release does not promise universal plugin support.
 
-<a href="https://translate.jellyfin.org/engage/jellyfin-android/">
-<img alt="Detailed Translation Status" src="https://translate.jellyfin.org/widgets/jellyfin-android/-/jellyfin-android/multi-auto.svg"/>
-</a>
+Home is newly implemented; detail/library/player screens retain the upstream TV implementation. Profile creation, parental controls, account switching and playback need end-to-end testing against your server before relying on this preview for children. No Fire TV hardware is attached to the build runner. Compile success does not establish smoothness, HDR/audio compatibility or all server-version behaviour.
 
-This client was rewritten from scratch with a fresh git history in July to August 2020, and replaces the old Cordova-based client,
-which can still be found [in the archives](https://github.com/jellyfin-archive/jellyfin-android-original).
+## Build
 
-## Build Process
+Install JDK 21 and Android SDK 36. Run:
 
-### Dependencies
+```sh
+./gradlew :app:assembleDebug -Pjellyfin.version=0.2.0-preview.1
+```
 
-- Android SDK
-
-### Build
-
-1. Clone or download this repository
-
-   ```sh
-   git clone https://github.com/jellyfin/jellyfin-android.git
-   cd jellyfin-android
-   ```
-
-2. Open the project in Android Studio and run it from there or build an APK directly through Gradle:
-
-   ```sh
-   ./gradlew assembleDebug
-   ```
-
-### Deploy to device/emulator
-
-   ```sh
-   ./gradlew installDebug
-   ```
-
-*You can also replace the "Debug" with "Release" to get an optimized release binary.*
-
-## Release Flavors
-
-There are two flavors (variants) of the Jellyfin for Android app:
-
-- The **proprietary** version comes with Google Chromecast support
-- The **libre** version comes without Google Chromecast support
-
-The proprietary version is available on [Google Play](https://play.google.com/store/apps/details?id=org.jellyfin.mobile) and the [Amazon Appstore](https://www.amazon.com/gp/aw/d/B081RFTTQ9), while the libre version is available on [F-Droid](https://f-droid.org/en/packages/org.jellyfin.mobile/).
-Additionally, `beta` releases exist for both flavors, but only the proprietary version is published to a beta track on [Google Play](https://play.google.com/store/apps/details?id=org.jellyfin.mobile).
-If you'd like to test the beta outside of Google Play, you can simply download it from the [GitHub releases](https://github.com/jellyfin/jellyfin-android/releases/latest).
+The APK is under `app/build/outputs/apk/debug`. `.github/workflows/renegadefin.yml` builds source and publishes prereleases only after successful compilation. The source, upstream attribution and GPL-2.0 license are included. Jellyfin and Jellywatch are independent projects; neither endorses this client. Jellywatch's public Player page was consulted for feature/layout inspiration, not copied source or assets.

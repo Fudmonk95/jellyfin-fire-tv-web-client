@@ -1,18 +1,25 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <lint>
+    <issue id="BinaryOperationInTimber" severity="error" />
+    <issue id="ConvertToWebp" severity="warning" />
+    <issue id="DuplicateStrings" severity="ignore" />
+    <issue id="EasterEgg" severity="fatal" />
     <issue id="ExtraTranslation" severity="warning" />
-    <issue id="MissingQuantity" severity="warning" />
-    <issue id="MissingTranslation" severity="ignore" />
-    <issue id="Typos">
-        <!-- Translations are handled through Weblate -->
-        <ignore regexp="app/src/main/res/values-.*" />
-    </issue>
-    <issue id="TypographyEllipsis">
-        <!-- Weblate doesn't use ellipsis characters -->
-        <ignore regexp="app/src/main/res/values-.*" />
-    </issue>
-    <!-- We're the end-user of media3 so we can more safely use unstable API's -->
-    <issue id="UnsafeOptInUsageError">
-        <option name="opt-in" value="androidx.media3.common.util.UnstableApi" />
+    <issue id="FragmentTagUsage" severity="error" />
+    <issue id="GradleDependency" severity="ignore" />
+    <issue id="KotlinPropertyAccess" severity="warning" />
+    <issue id="LambdaLast" severity="warning" />
+    <issue id="LogNotTimber" severity="error" />
+    <issue id="MangledCRLF" severity="warning" />
+    <issue id="NegativeMargin" severity="warning" />
+    <issue id="NoHardKeywords" severity="warning" />
+    <issue id="Registered" severity="warning" />
+    <issue id="RequiredSize" severity="error" />
+    <issue id="Typos" severity="ignore" />
+    <issue id="UnknownNullness" severity="informational" />
+    <issue id="UnusedIds" severity="ignore" />
+    <issue id="UnusedAttribute">
+        <ignore regexp="usesCleartextTraffic" />
+        <ignore regexp="networkSecurityConfig" />
     </issue>
 </lint>

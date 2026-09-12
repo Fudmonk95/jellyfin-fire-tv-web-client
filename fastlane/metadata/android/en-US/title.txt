@@ -1,1 +1,1 @@
-Jellyfin
+Jellyfin for Android TV

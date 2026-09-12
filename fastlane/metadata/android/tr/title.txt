@@ -1,1 +1,1 @@
-Jellyfin
+Android TV için Jellyfin

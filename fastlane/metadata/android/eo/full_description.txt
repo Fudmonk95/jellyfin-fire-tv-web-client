@@ -11,4 +11,4 @@ Kun Jellyfin-servilo vi povas:
 * Elsendflui vian plurmediojn al via Android-aparato
 * Spekti vian kolektojn en faciluza interfaco
 
-Jen la oficiala akompana Jellyfin-apo por Android. Dankon pro uzi Jellyfin!
+Jen la oficiala akompana Jellyfin-apo por Android TV. Dankon pro uzi Jellyfin!

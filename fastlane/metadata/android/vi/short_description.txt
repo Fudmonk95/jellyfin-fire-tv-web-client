@@ -1,1 +1,1 @@
-Ứng dụng khách di động cho Jellyfin, hệ thống phần mềm phương tiện miễn phí
+Ứng dụng truyền hình Jellyfin, hệ thống đa phương tiện phần mềm miễn phí

@@ -11,4 +11,4 @@ Avec un serveur Jellyfin, vous pouvez :
 * Diffuser vos médias sur votre appareil Android
 * Consulter votre médiathèque via une interface intuitive
 
-Ceci est l'application compagnon officielle de Jellyfin pour Android. Merci d'utiliser Jellyfin !
+Ceci est l'application compagnon officielle de Jellyfin pour Android TV. Merci d'utiliser Jellyfin !

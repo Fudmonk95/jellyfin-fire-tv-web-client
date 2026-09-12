@@ -11,4 +11,4 @@ Met een Jellyfin-server kun je:
 * Je media streamen naar je Android-apparaat
 * Je collectie bekijken in een eenvoudig te gebruiken interface
 
-Dit is de officiële Jellyfin-app voor Android. Bedankt voor het gebruiken van Jellyfin!
+Dit is de officiële Jellyfin-app voor Android TV. Bedankt voor het gebruiken van Jellyfin!

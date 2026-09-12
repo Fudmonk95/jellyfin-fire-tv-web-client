@@ -11,4 +11,4 @@ Jellyfin 서버의 기능:
 * Android 장치에서 미디어 스트리밍
 * 쉽게 사용할 수 있는 인터페이스로 직접 만든 콜렉션 보기
 
-이 앱은 공식 Android용 Jellyfin 앱입니다. Jellyfin을 사용해주셔서 감사합니다!
+이 앱은 공식 Android TV용 Jellyfin 앱입니다. Jellyfin을 사용해주셔서 감사합니다!

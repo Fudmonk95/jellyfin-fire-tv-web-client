@@ -11,4 +11,4 @@ Com um servidor Jellyfin, você poderá:
 * Transmitir sua mídia para o seu dispositivo Android
 * Ver sua coleção em uma interface fácil de usar
 
-Este é o aplicativo oficial do Jellyfin para Android. Obrigado por usar o Jellyfin!
+Este é o aplicativo oficial do Jellyfin para Android TV. Obrigado por usar o Jellyfin!

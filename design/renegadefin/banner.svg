@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+ <defs><linearGradient id="fire" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#ff6035"/><stop offset="1" stop-color="#ffd166"/></linearGradient></defs>
+ <rect width="640" height="360" fill="#101114"/>
+ <path d="M430 0H640V360H315Z" fill="#1b1d23"/>
+ <g transform="translate(245 30) scale(.6)"><path fill="url(#fire)" d="M137 18C150 63 211 82 211 143C211 190 173 223 124 231L149 191C125 205 95 205 72 186C47 165 42 132 58 105L99 57L89 113C107 99 129 65 137 18Z"/><path fill="#101114" d="M116 108L172 143L101 172Z"/><path fill="#ffb849" d="M49 218L86 207L69 237Z"/></g>
+ <text x="320" y="232" text-anchor="middle" font-family="DejaVu Sans,sans-serif" font-weight="bold" font-size="47" fill="#ffffff">RENEGADE<tspan fill="#ffb849">FIN</tspan></text>
+ <text x="320" y="278" text-anchor="middle" font-family="DejaVu Sans,sans-serif" letter-spacing="5" font-size="15" fill="#c7c9cf">YOUR MEDIA. YOUR RULES.</text>
+</svg>

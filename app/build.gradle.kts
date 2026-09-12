@@ -1,229 +1,186 @@
-import io.gitlab.arturbosch.detekt.Detekt
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
-    alias(libs.plugins.android.app)
-    alias(libs.plugins.kotlin.ksp)
-    alias(libs.plugins.kotlin.parcelize)
-    alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.androidx.room)
-    alias(libs.plugins.detekt)
-    alias(libs.plugins.android.junit5)
-}
-
-detekt {
-    buildUponDefaultConfig = true
-    ignoreFailures = true
-    config.setFrom(files("$rootDir/detekt.yaml"))
-    parallel = true
-}
-
-kotlin {
-    compilerOptions {
-        jvmTarget = JvmTarget.JVM_11
-        optIn.add("kotlin.RequiresOptIn")
-    }
+	id("com.android.application")
+	kotlin("android")
+	alias(libs.plugins.kotlin.serialization)
+	alias(libs.plugins.kotlin.compose)
+	alias(libs.plugins.aboutlibraries)
 }
 
 android {
-    namespace = "org.jellyfin.mobile"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
+	namespace = "org.jellyfin.androidtv"
+	compileSdk = libs.versions.android.compileSdk.get().toInt()
 
-    defaultConfig {
-        applicationId = "uk.co.cyberscott.jellyfinwebtv"
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionName = project.getVersionName()
-        versionCode = getVersionCode(versionName!!)
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables.useSupportLibrary = true
-    }
+	defaultConfig {
+		minSdk = libs.versions.android.minSdk.get().toInt()
+		targetSdk = libs.versions.android.targetSdk.get().toInt()
 
-    signingConfigs {
-        val keystoreFile = getProperty("keystore.file")
-        val keystorePassword = getProperty("keystore.password")
-        val signingKeyAlias = getProperty("signing.key.alias")
-        val signingKeyPassword = getProperty("signing.key.password")
+		// Release version
+		applicationId = "uk.co.cyberscott.renegadefin"
+		versionName = project.getVersionName()
+		versionCode = getVersionCode(versionName!!)
+	}
 
-        if (keystoreFile != null && keystorePassword != null && signingKeyAlias != null && signingKeyPassword != null) {
-            create("release") {
-                storeFile = file(keystoreFile)
-                storePassword = keystorePassword
-                keyAlias = signingKeyAlias
-                keyPassword = signingKeyPassword
-            }
-        }
-    }
+	buildFeatures {
+		buildConfig = true
+		viewBinding = true
+		compose = true
+	}
 
-    dependenciesInfo {
-        includeInBundle = false
-        includeInApk = false
-    }
+	compileOptions {
+		isCoreLibraryDesugaringEnabled = true
+	}
 
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = true
-            isShrinkResources = true
+	signingConfigs {
+		val keystoreFile = getProperty("keystore.file")
+		val keystorePassword = getProperty("keystore.password")
+		val signingKeyAlias = getProperty("signing.key.alias")
+		val signingKeyPassword = getProperty("signing.key.password")
 
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            signingConfig = signingConfigs.findByName("release")
-        }
+		if (keystoreFile != null && keystorePassword != null && signingKeyAlias != null && signingKeyPassword != null) {
+			create("release") {
+				storeFile = file(keystoreFile)
+				storePassword = keystorePassword
+				keyAlias = signingKeyAlias
+				keyPassword = signingKeyPassword
+			}
+		}
+	}
 
-        getByName("debug") {
-            applicationIdSuffix = ".debug"
-            isDebuggable = true
-        }
-    }
+	dependenciesInfo {
+		includeInBundle = false
+		includeInApk = false
+	}
 
-    flavorDimensions += "variant"
-    productFlavors {
-        register("libre") {
-            dimension = "variant"
-            buildConfigField("boolean", "IS_PROPRIETARY", "false")
-        }
-        register("proprietary") {
-            dimension = "variant"
-            buildConfigField("boolean", "IS_PROPRIETARY", "true")
-            isDefault = true
-        }
-    }
+	buildTypes {
+		release {
+			isMinifyEnabled = false
 
-    bundle {
-        language {
-            enableSplit = false
-        }
-    }
+			// Set package names used in various XML files
+			resValue("string", "app_id", "uk.co.cyberscott.renegadefin")
+			resValue("string", "app_search_suggest_authority", "${defaultConfig.applicationId}.content")
+			resValue("string", "app_search_suggest_intent_data", "content://${defaultConfig.applicationId}.content/intent")
 
-    androidResources {
-        generateLocaleConfig = true
-    }
+			// Set flavored application name
+			resValue("string", "app_name", "@string/app_name_release")
 
-    buildFeatures {
-        buildConfig = true
-        viewBinding = true
-        compose = true
-    }
+			buildConfigField("boolean", "DEVELOPMENT", "false")
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-        isCoreLibraryDesugaringEnabled = true
-    }
+			signingConfig = signingConfigs.findByName("release")
+		}
 
-    lint {
-        lintConfig = file("$rootDir/android-lint.xml")
-        abortOnError = false
-        sarifReport = true
-        checkDependencies = true
-    }
+		debug {
+			// Use different application id to run release and debug at the same time
+			applicationIdSuffix = ".debug"
 
-    room {
-        schemaDirectory("$projectDir/schemas")
-    }
+			// Set package names used in various XML files
+			resValue("string", "app_id", defaultConfig.applicationId + applicationIdSuffix)
+			resValue("string", "app_search_suggest_authority", "${defaultConfig.applicationId + applicationIdSuffix}.content")
+			resValue("string", "app_search_suggest_intent_data", "content://${defaultConfig.applicationId + applicationIdSuffix}.content/intent")
+
+			// Set flavored application name
+			resValue("string", "app_name", "@string/app_name_debug")
+
+			buildConfigField("boolean", "DEVELOPMENT", (defaultConfig.versionCode!! < 100).toString())
+		}
+	}
+
+	lint {
+		lintConfig = file("$rootDir/android-lint.xml")
+		abortOnError = false
+		sarifReport = true
+		checkDependencies = true
+	}
+
+	testOptions.unitTests.all {
+		it.useJUnitPlatform()
+	}
 }
 
-base.archivesName.set("jellyfin-android-v${project.getVersionName()}")
+base.archivesName.set("jellyfin-androidtv-v${project.getVersionName()}")
+
+tasks.register("versionTxt") {
+	val path = layout.buildDirectory.asFile.get().resolve("version.txt")
+
+	doLast {
+		val versionString = "v${android.defaultConfig.versionName}=${android.defaultConfig.versionCode}"
+		logger.info("Writing [$versionString] to $path")
+		path.writeText("$versionString\n")
+	}
+}
 
 dependencies {
-    val proprietaryImplementation by configurations
+	// Jellyfin
+	implementation(projects.playback.core)
+	implementation(projects.playback.jellyfin)
+	implementation(projects.playback.media3.exoplayer)
+	implementation(projects.playback.media3.session)
+	implementation(projects.preference)
+	implementation(libs.jellyfin.sdk) {
+		// Change version if desired
+		val sdkVersion = findProperty("sdk.version")?.toString()
+		when (sdkVersion) {
+			"local" -> version { strictly("latest-SNAPSHOT") }
+			"snapshot" -> version { strictly("master-SNAPSHOT") }
+			"unstable-snapshot" -> version { strictly("openapi-unstable-SNAPSHOT") }
+		}
+	}
 
-    // Kotlin
-    implementation(libs.bundles.coroutines)
-    implementation(libs.kotlin.serialization.json)
+	// Kotlin
+	implementation(libs.kotlinx.coroutines)
+	implementation(libs.kotlinx.serialization.json)
 
-    // Core
-    implementation(libs.bundles.koin)
-    implementation(libs.androidx.core)
-    implementation(libs.androidx.core.splashscreen)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.activity)
-    implementation(libs.androidx.fragment)
-    implementation(libs.androidx.documentfile)
-    implementation(libs.androidx.work.runtime)
-    coreLibraryDesugaring(libs.androiddesugarlibs)
+	// Android(x)
+	implementation(libs.androidx.core)
+	implementation(libs.androidx.activity)
+	implementation(libs.androidx.activity.compose)
+	implementation(libs.androidx.fragment)
+	implementation(libs.androidx.fragment.compose)
+	implementation(libs.androidx.leanback.core)
+	implementation(libs.androidx.leanback.preference)
+	implementation(libs.androidx.preference)
+	implementation(libs.androidx.appcompat)
+	implementation(libs.androidx.tvprovider)
+	implementation(libs.androidx.constraintlayout)
+	implementation(libs.androidx.recyclerview)
+	implementation(libs.androidx.work.runtime)
+	implementation(libs.bundles.androidx.lifecycle)
+	implementation(libs.androidx.window)
+	implementation(libs.androidx.cardview)
+	implementation(libs.androidx.startup)
+	implementation(libs.bundles.androidx.compose)
+	implementation(libs.accompanist.permissions)
 
-    // Lifecycle
-    implementation(libs.bundles.androidx.lifecycle)
+	// Dependency Injection
+	implementation(libs.bundles.koin)
 
-    // UI
-    implementation(libs.google.material)
-    implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.webkit)
-    implementation(libs.modernandroidpreferences)
+	// Media players
+	implementation(libs.androidx.media3.exoplayer)
+	implementation(libs.androidx.media3.datasource.okhttp)
+	implementation(libs.androidx.media3.exoplayer.hls)
+	implementation(libs.androidx.media3.ui)
+	implementation(libs.jellyfin.androidx.media3.ffmpeg.decoder)
 
-    // Jetpack Compose
-    implementation(libs.bundles.compose)
+	// Markdown
+	implementation(libs.bundles.markwon)
 
-    // Network
-    val sdkVersion = findProperty("sdk.version")?.toString()
-    implementation(libs.jellyfin.sdk) {
-        // Change version if desired
-        when (sdkVersion) {
-            "local" -> version { strictly(JellyfinSdk.LOCAL) }
-            "snapshot" -> version { strictly(JellyfinSdk.SNAPSHOT) }
-            "unstable-snapshot" -> version { strictly(JellyfinSdk.SNAPSHOT_UNSTABLE) }
-        }
-    }
-    implementation(libs.bundles.coil)
+	// Image utility
+	implementation(libs.bundles.coil)
 
-    // Media
-    implementation(libs.androidx.media)
-    implementation(libs.androidx.mediarouter)
-    implementation(libs.bundles.androidx.media3)
-    proprietaryImplementation(libs.androidx.media3.cast)
-    proprietaryImplementation(libs.bundles.playservices)
-    implementation(libs.libass.media)
+	// Crash Reporting
+	implementation(libs.bundles.acra)
 
-    // Room
-    implementation(libs.bundles.androidx.room)
-    ksp(libs.androidx.room.compiler)
+	// Licenses
+	implementation(libs.aboutlibraries)
 
-    // Monitoring
-    implementation(libs.slf4j.timber)
-    implementation(libs.timber)
+	// Logging
+	implementation(libs.timber)
+	implementation(libs.slf4j.timber)
 
-    // Testing
-    testImplementation(libs.junit.api)
-    testRuntimeOnly(libs.junit.engine)
-    testImplementation(libs.bundles.kotest)
-    testImplementation(libs.mockk)
-    androidTestImplementation(libs.bundles.androidx.test)
+	// Compatibility (desugaring)
+	coreLibraryDesugaring(libs.android.desugar)
 
-    // Formatting rules for detekt
-    detektPlugins(libs.detekt.formatting)
-}
-
-tasks {
-    withType<Detekt> {
-        reports {
-            sarif.required.set(true)
-        }
-    }
-
-    // Testing
-    withType<Test> {
-        useJUnit()
-        testLogging {
-            events(
-                org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED,
-                org.gradle.api.tasks.testing.logging.TestLogEvent.STANDARD_ERROR,
-                org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
-            )
-            exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
-            showExceptions = true
-            showCauses = true
-            showStackTraces = true
-        }
-    }
-
-    register("versionTxt") {
-        doLast {
-            val path = layout.buildDirectory.file("version.txt").get().asFile
-
-            val versionString = "v${android.defaultConfig.versionName}=${android.defaultConfig.versionCode}"
-            println("Writing [$versionString] to $path")
-            path.writeText("$versionString\n")
-        }
-    }
+	// Testing
+	testImplementation(libs.kotest.runner.junit5)
+	testImplementation(libs.kotest.assertions)
+	testImplementation(libs.mockk)
 }

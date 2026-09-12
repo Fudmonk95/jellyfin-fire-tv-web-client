@@ -1,1 +1,1 @@
-Jellyfin
+Android TV用 Jellyfin

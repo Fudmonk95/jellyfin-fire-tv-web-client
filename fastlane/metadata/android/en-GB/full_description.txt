@@ -11,4 +11,4 @@ With a Jellyfin server, you can:
 * Stream your media to your Android device
 * View your collection in an easy to use interface
 
-This is the official Jellyfin companion app for Android. Thank you for using Jellyfin!
+This is the official Jellyfin companion app for Android TV. Thank you for using Jellyfin!

@@ -1,1 +1,1 @@
-Mobiler Client für Jellyfin, das freie Mediensystem
+TV-Client für Jellyfin, das freie Mediensystem

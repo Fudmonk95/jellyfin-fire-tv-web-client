@@ -11,4 +11,4 @@ Con un servidor Jellyfin, puedes:
 * Ver tus archivos multimedia en tu dispositivo Android
 * Ver tu colección en una interfaz fácil de usar
 
-Esta es la app complementaria oficial de Jellyfin para Android. ¡Gracias por usar Jellyfin!
+Esta es la app complementaria oficial de Jellyfin para Android TV. ¡Gracias por usar Jellyfin!

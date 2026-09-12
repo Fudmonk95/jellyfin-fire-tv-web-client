@@ -1,1 +1,1 @@
-Aplicația pentru mobil Jellyfin, sistemul de conținut media gratuit
+Aplicația pentru TV Jellyfin, sistemul de conținut media gratuit
