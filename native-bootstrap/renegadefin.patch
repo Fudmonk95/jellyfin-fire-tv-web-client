@@ -1,0 +1,1190 @@
+diff --git a/README.md b/README.md
+index 2929dbd..dc33070 100644
+--- a/README.md
++++ b/README.md
+@@ -1,89 +1,37 @@
+-<h1 align="center">Jellyfin Android TV</h1>
+-<h3 align="center">Part of the <a href="https://jellyfin.org">Jellyfin Project</a></h3>
++# RenegadeFin
+ 
+----
++An experimental native Jellyfin client for Fire TV and Android TV. RenegadeFin replaces the earlier Jellyfin Web TV wrapper in this repository. It is an unofficial fork of Jellyfin for Android TV, based on stable v0.19.10 (`984181a3d6ab14e9a6d2dcc850c582e1c138bd95`).
+ 
+-<p align="center">
+-<img alt="Logo banner" src="https://raw.githubusercontent.com/jellyfin/jellyfin-ux/master/branding/SVG/banner-logo-solid.svg?sanitize=true"/>
+-<br/><br/>
+-<a href="https://github.com/jellyfin/jellyfin-androidtv">
+-<img alt="GPL 2.0 License" src="https://img.shields.io/github/license/jellyfin/jellyfin-androidtv.svg"/>
+-</a>
+-<a href="https://github.com/jellyfin/jellyfin-androidtv/releases">
+-<img alt="Current Release" src="https://img.shields.io/github/release/jellyfin/jellyfin-androidtv.svg"/>
+-</a>
+-<a href="https://translate.jellyfin.org/projects/jellyfin-android/jellyfin-androidtv/">
+-<img alt="Translation Status" src="https://translate.jellyfin.org/widgets/jellyfin-android/-/jellyfin-androidtv/svg-badge.svg"/>
+-</a>
+-<br/>
+-<a href="https://opencollective.com/jellyfin">
+-<img alt="Donate" src="https://img.shields.io/opencollective/all/jellyfin.svg?label=backers"/>
+-</a>
+-<a href="https://features.jellyfin.org">
+-<img alt="Feature Requests" src="https://img.shields.io/badge/fider-vote%20on%20features-success.svg"/>
+-</a>
+-<a href="https://matrix.to/#/+jellyfin:matrix.org">
+-<img alt="Chat on Matrix" src="https://img.shields.io/matrix/jellyfin:matrix.org.svg?logo=matrix"/>
+-</a>
+-<a href="https://www.reddit.com/r/jellyfin">
+-<img alt="Join our Subreddit" src="https://img.shields.io/badge/reddit-r%2Fjellyfin-%23FF5700.svg"/>
+-</a>
+-<br/>
+-<a href="https://play.google.com/store/apps/details?id=org.jellyfin.androidtv">
+-<img width="153" alt="Jellyfin on Google Play" src="https://jellyfin.org/images/store-icons/google-play.png"/>
+-</a>
+-<a href="https://www.amazon.com/gp/aw/d/B07TX7Z725">
+-<img width="153" alt="Jellyfin on Amazon Appstore" src="https://jellyfin.org/images/store-icons/amazon.png"/>
+-</a>
+-<a href="https://f-droid.org/en/packages/org.jellyfin.androidtv/">
+-<img width="153" alt="Jellyfin on F-Droid" src="https://jellyfin.org/images/store-icons/fdroid.png"/>
+-</a>
+-<br/>
+-<a href="https://repo.jellyfin.org/releases/client/androidtv/">Download archive</a>
+-</p>
++![RenegadeFin](design/renegadefin/banner.svg)
+ 
+-Jellyfin Android TV is a Jellyfin client for Android TV, Nvidia Shield, and Amazon Fire TV devices.
+-We welcome all contributions and pull requests! If you have a larger feature in mind please open an
+-issue so we can discuss the implementation before you start. 
++## In this preview
+ 
+-## Translating
++- Native Compose home with horizontal shelves, featured artwork, bounded image requests and D-pad selection.
++- Charcoal, orange and amber design; original fin/flame/play mark; 16:9 Fire TV banner.
++- Upstream native playback, search, library browsing, subtitles and audio controls.
++- Manage profiles from Home: fresh administrator password confirmation, create separate Jellyfin users, enable/disable profiles, choose libraries and age ratings, select allowed/blocked tags and unrated categories, review changes, and verify saved policies.
++- Profiles are real Jellyfin users with separate watch history and server-enforced permissions. Bonfire is not required. Sign-in uses Jellyfin's normal authentication; a profile password is not a separate local PIN.
+ 
+-Translations can be improved very easily from our
+-[Weblate](https://translate.jellyfin.org/projects/jellyfin-android/jellyfin-androidtv) instance.
+-Look through the following graphic to see if your native language could use some work!
++This is not yet household sub-profiles under one account. A companion plugin for household delegation and a separate PIN flow is future work. The native profile editor currently requires a Jellyfin administrator. Administrator accounts cannot be edited through it. New profiles start disabled with no library access until an administrator configures and enables them. If creation is interrupted, check the Users page in Jellyfin before retrying.
+ 
+-<a href="https://translate.jellyfin.org/engage/jellyfin-android/">
+-<img alt="Detailed Translation Status" src="https://translate.jellyfin.org/widgets/jellyfin-android/-/jellyfin-androidtv/multi-auto.svg"/>
+-</a>
++## Install
+ 
+-## Build Process
++Download the RenegadeFin preview APK from this repository's Releases page and sideload it with Downloader. This uses a separate package from Jellyfin and the old web wrapper. Connect to your server and sign in. The profile icon switches accounts; Manage profiles edits restrictions after administrator confirmation.
+ 
+-### Dependencies
++APK builds are debug signed previews. Do not assume two CI builds have compatible signing keys. A production signing key and device testing are needed before a stable release.
+ 
+-- Android Studio
++## Compatibility and limits
+ 
+-### Build
++Server metadata plugins continue to provide their data through Jellyfin. Features needing client controls require explicit integration. Web-only themes, injected menus and CSS do not run in this native app. This release does not promise universal plugin support.
+ 
+-1. Clone or download this repository
++Home is newly implemented; detail/library/player screens retain the upstream TV implementation. Profile creation, parental controls, account switching and playback need end-to-end testing against your server before relying on this preview for children. No Fire TV hardware is attached to the build runner. Compile success does not establish smoothness, HDR/audio compatibility or all server-version behaviour.
+ 
+-   ```sh
+-   git clone https://github.com/jellyfin/jellyfin-androidtv.git
+-   cd jellyfin-androidtv
+-   ```
++## Build
+ 
+-2. Open the project in Android Studio and run it from there or build an APK directly through Gradle:
++Install JDK 21 and Android SDK 36. Run:
+ 
+-   ```sh
+-   ./gradlew assembleDebug
+-   ```
+-   
+-   Add the Android SDK to your PATH environment variable or create the ANDROID_SDK_ROOT variable for
+-   this to work.
++```sh
++./gradlew :app:assembleDebug -Pjellyfin.version=0.2.0-preview.1
++```
+ 
+-### Deploy to device/emulator
+-
+-   ```sh
+-   ./gradlew installDebug
+-   ```
+-
+-*You can also replace the "Debug" with "Release" to get an optimized release binary.*
++The APK is under `app/build/outputs/apk/debug`. `.github/workflows/renegadefin.yml` builds source and publishes prereleases only after successful compilation. The source, upstream attribution and GPL-2.0 license are included. Jellyfin and Jellywatch are independent projects; neither endorses this client. Jellywatch's public Player page was consulted for feature/layout inspiration, not copied source or assets.
+diff --git a/app/build.gradle.kts b/app/build.gradle.kts
+index 5b2091f..3ebaf8f 100644
+--- a/app/build.gradle.kts
++++ b/app/build.gradle.kts
+@@ -15,7 +15,7 @@ android {
+ 		targetSdk = libs.versions.android.targetSdk.get().toInt()
+ 
+ 		// Release version
+-		applicationId = namespace
++		applicationId = "uk.co.cyberscott.renegadefin"
+ 		versionName = project.getVersionName()
+ 		versionCode = getVersionCode(versionName!!)
+ 	}
+@@ -56,9 +56,9 @@ android {
+ 			isMinifyEnabled = false
+ 
+ 			// Set package names used in various XML files
+-			resValue("string", "app_id", namespace!!)
+-			resValue("string", "app_search_suggest_authority", "${namespace}.content")
+-			resValue("string", "app_search_suggest_intent_data", "content://${namespace}.content/intent")
++			resValue("string", "app_id", "uk.co.cyberscott.renegadefin")
++			resValue("string", "app_search_suggest_authority", "${defaultConfig.applicationId}.content")
++			resValue("string", "app_search_suggest_intent_data", "content://${defaultConfig.applicationId}.content/intent")
+ 
+ 			// Set flavored application name
+ 			resValue("string", "app_name", "@string/app_name_release")
+@@ -73,9 +73,9 @@ android {
+ 			applicationIdSuffix = ".debug"
+ 
+ 			// Set package names used in various XML files
+-			resValue("string", "app_id", namespace + applicationIdSuffix)
+-			resValue("string", "app_search_suggest_authority", "${namespace + applicationIdSuffix}.content")
+-			resValue("string", "app_search_suggest_intent_data", "content://${namespace + applicationIdSuffix}.content/intent")
++			resValue("string", "app_id", defaultConfig.applicationId + applicationIdSuffix)
++			resValue("string", "app_search_suggest_authority", "${defaultConfig.applicationId + applicationIdSuffix}.content")
++			resValue("string", "app_search_suggest_intent_data", "content://${defaultConfig.applicationId + applicationIdSuffix}.content/intent")
+ 
+ 			// Set flavored application name
+ 			resValue("string", "app_name", "@string/app_name_debug")
+diff --git a/app/src/main/AndroidManifest.xml b/app/src/main/AndroidManifest.xml
+index 356abfc..3971274 100644
+--- a/app/src/main/AndroidManifest.xml
++++ b/app/src/main/AndroidManifest.xml
+@@ -41,10 +41,10 @@
+         android:name=".JellyfinApplication"
+         android:allowBackup="true"
+         android:appCategory="video"
+-        android:banner="@mipmap/app_banner"
++        android:banner="@drawable/renegade_banner"
+         android:dataExtractionRules="@xml/backup_rules"
+         android:fullBackupContent="@xml/backup_content"
+-        android:icon="@mipmap/app_icon"
++        android:icon="@drawable/renegade_icon"
+         android:label="@string/app_name"
+         android:largeHeap="true"
+         android:supportsRtl="true"
+@@ -52,6 +52,8 @@
+         android:usesCleartextTraffic="true"
+         android:networkSecurityConfig="@xml/network_security_config">
+ 
++        <activity android:name=".ui.renegade.ProfileActivity" android:exported="false" android:screenOrientation="landscape" />
++
+         <!-- Legacy service required for AccountManagerMigration -->
+         <service
+             android:name=".auth.service.AuthenticatorService"
+diff --git a/app/src/main/java/org/jellyfin/androidtv/auth/store/AuthenticationPreferences.kt b/app/src/main/java/org/jellyfin/androidtv/auth/store/AuthenticationPreferences.kt
+index 54fdb92..f93f878 100644
+--- a/app/src/main/java/org/jellyfin/androidtv/auth/store/AuthenticationPreferences.kt
++++ b/app/src/main/java/org/jellyfin/androidtv/auth/store/AuthenticationPreferences.kt
+@@ -18,7 +18,7 @@ class AuthenticationPreferences(context: Context) : SharedPreferenceStore(
+ 		val autoLoginUserId = stringPreference("auto_login_user_id", "")
+ 
+ 		val sortBy = enumPreference("sort_by", AuthenticationSortBy.LAST_USE)
+-		val alwaysAuthenticate = booleanPreference("always_authenticate", false)
++		val alwaysAuthenticate = booleanPreference("always_authenticate", true)
+ 
+ 		// Persistent state
+ 		val lastServerId = stringPreference("last_server_id", "")
+diff --git a/app/src/main/java/org/jellyfin/androidtv/ui/base/colorScheme.kt b/app/src/main/java/org/jellyfin/androidtv/ui/base/colorScheme.kt
+index 63b608a..00991de 100644
+--- a/app/src/main/java/org/jellyfin/androidtv/ui/base/colorScheme.kt
++++ b/app/src/main/java/org/jellyfin/androidtv/ui/base/colorScheme.kt
+@@ -5,19 +5,19 @@ import androidx.compose.runtime.staticCompositionLocalOf
+ import androidx.compose.ui.graphics.Color
+ 
+ fun colorScheme(): ColorScheme = ColorScheme(
+-	background = Color(0xFF101010),
++	background = Color(0xFF101114),
+ 	onBackground = Color(0xFFFFFFFF),
+ 	button = Color(0xB3747474),
+ 	onButton = Color(0xFFDDDDDD),
+-	buttonFocused = Color(0xE6CCCCCC),
+-	onButtonFocused = Color(0xFF444444),
++	buttonFocused = Color(0xFFFFAF45),
++	onButtonFocused = Color(0xFF101114),
+ 	buttonDisabled = Color(0x33747474),
+ 	onButtonDisabled = Color(0xFF686868),
+-	buttonActive = Color(0x4DCCCCCC),
++	buttonActive = Color(0x704B301E),
+ 	onButtonActive = Color(0xFFDDDDDD),
+ 	input = Color(0xB3747474),
+-	onInput = Color(0xE6CCCCCC),
+-	inputFocused = Color(0xE6CCCCCC),
++	onInput = Color(0xFFFFAF45),
++	inputFocused = Color(0xFFFFAF45),
+ 	onInputFocused = Color(0xFFDDDDDD),
+ 	recording = Color(0xB3FF7474),
+ 	onRecording = Color(0xFFDDDDDD),
+diff --git a/app/src/main/java/org/jellyfin/androidtv/ui/home/HomeFragment.kt b/app/src/main/java/org/jellyfin/androidtv/ui/home/HomeFragment.kt
+index 46c8b3d..b4964d5 100644
+--- a/app/src/main/java/org/jellyfin/androidtv/ui/home/HomeFragment.kt
++++ b/app/src/main/java/org/jellyfin/androidtv/ui/home/HomeFragment.kt
+@@ -1,96 +1,146 @@
+ package org.jellyfin.androidtv.ui.home
+ 
+ import android.os.Bundle
++import android.content.Intent
+ import android.view.LayoutInflater
+-import android.view.View
+ import android.view.ViewGroup
++import androidx.compose.foundation.background
++import androidx.compose.foundation.clickable
+ import androidx.compose.foundation.focusGroup
+-import androidx.compose.foundation.layout.Column
+-import androidx.compose.foundation.layout.fillMaxSize
+-import androidx.compose.runtime.LaunchedEffect
+-import androidx.compose.runtime.getValue
+-import androidx.compose.runtime.mutableStateOf
+-import androidx.compose.runtime.remember
+-import androidx.compose.runtime.setValue
++import androidx.compose.foundation.layout.*
++import androidx.compose.foundation.lazy.LazyColumn
++import androidx.compose.foundation.lazy.LazyRow
++import androidx.compose.foundation.lazy.items
++import androidx.compose.foundation.shape.RoundedCornerShape
++import androidx.compose.runtime.*
+ import androidx.compose.ui.Modifier
+-import androidx.compose.ui.focus.FocusDirection
+-import androidx.compose.ui.focus.FocusRequester
+-import androidx.compose.ui.focus.focusProperties
+-import androidx.compose.ui.focus.focusRequester
++import androidx.compose.ui.Alignment
++import androidx.compose.ui.draw.clip
++import androidx.compose.ui.focus.*
++import androidx.compose.ui.graphics.Brush
++import androidx.compose.ui.graphics.Color
++import androidx.compose.ui.graphics.graphicsLayer
++import androidx.compose.ui.layout.ContentScale
++import androidx.compose.ui.text.font.FontWeight
++import androidx.compose.ui.text.style.TextOverflow
++import androidx.compose.ui.unit.dp
++import androidx.compose.ui.unit.sp
+ import androidx.fragment.app.Fragment
+-import androidx.fragment.compose.AndroidFragment
+ import androidx.fragment.compose.content
+-import androidx.lifecycle.Lifecycle
+-import androidx.lifecycle.flowWithLifecycle
+-import androidx.lifecycle.lifecycleScope
+-import kotlinx.coroutines.flow.launchIn
+-import kotlinx.coroutines.flow.map
+-import kotlinx.coroutines.flow.onEach
+-import org.jellyfin.androidtv.auth.repository.ServerRepository
+-import org.jellyfin.androidtv.auth.repository.SessionRepository
+-import org.jellyfin.androidtv.data.repository.NotificationsRepository
++import coil3.compose.AsyncImage
++import kotlinx.coroutines.CancellationException
++import kotlinx.coroutines.async
++import kotlinx.coroutines.delay
++import kotlinx.coroutines.coroutineScope
++import org.jellyfin.androidtv.auth.repository.UserRepository
++import org.jellyfin.androidtv.data.repository.ItemRepository
+ import org.jellyfin.androidtv.ui.base.JellyfinTheme
++import org.jellyfin.androidtv.ui.base.Text
++import org.jellyfin.androidtv.ui.base.button.Button
++import org.jellyfin.androidtv.ui.navigation.Destinations
++import org.jellyfin.androidtv.ui.navigation.NavigationRepository
+ import org.jellyfin.androidtv.ui.shared.toolbar.MainToolbar
+ import org.jellyfin.androidtv.ui.shared.toolbar.MainToolbarActiveButton
++import org.jellyfin.androidtv.ui.renegade.ProfileActivity
++import org.jellyfin.androidtv.util.apiclient.*
++import org.jellyfin.sdk.api.client.ApiClient
++import org.jellyfin.sdk.api.client.extensions.itemsApi
++import org.jellyfin.sdk.api.client.extensions.userViewsApi
++import org.jellyfin.sdk.model.api.*
+ import org.koin.android.ext.android.inject
+ 
++/** Native, bounded home shelves. No WebView, injected CSS, or DOM focus scans. */
+ class HomeFragment : Fragment() {
+-	private val sessionRepository by inject<SessionRepository>()
+-	private val serverRepository by inject<ServerRepository>()
+-	private val notificationRepository by inject<NotificationsRepository>()
++    private val api by inject<ApiClient>()
++    private val users by inject<UserRepository>()
++    private val navigation by inject<NavigationRepository>()
++    private data class Shelf(val title: String, val items: List<BaseItemDto>, val library: Boolean = false)
+ 
+-	override fun onCreateView(
+-		inflater: LayoutInflater,
+-		container: ViewGroup?,
+-		savedInstanceState: Bundle?
+-	) = content {
+-		val rowsFocusRequester = remember { FocusRequester() }
+-		LaunchedEffect(rowsFocusRequester) { rowsFocusRequester.requestFocus() }
+-
+-		JellyfinTheme {
+-			Column {
+-				MainToolbar(MainToolbarActiveButton.Home)
+-
+-				// The leanback code has its own awful focus handling that doesn't work properly with Compose view inteop to workaround this
+-				// issue we add custom behavior that only allows focus exit when the current selected row is the first one. Additionally when
+-				// we do switch the focus, we reset the leanback state so it won't cause weird behavior when focus is regained
+-				var rowsSupportFragment by remember { mutableStateOf<HomeRowsFragment?>(null) }
+-				AndroidFragment<HomeRowsFragment>(
+-					modifier = Modifier
+-						.focusGroup()
+-						.focusRequester(rowsFocusRequester)
+-						.focusProperties {
+-							onExit = {
+-								val isFirstRowSelected = rowsSupportFragment?.selectedPosition?.let { it <= 0 } ?: false
+-								if (requestedFocusDirection != FocusDirection.Up || !isFirstRowSelected) {
+-									cancelFocusChange()
+-								} else {
+-									rowsSupportFragment?.selectedPosition = 0
+-									rowsSupportFragment?.verticalGridView?.clearFocus()
+-								}
+-							}
+-						}
+-						.fillMaxSize(),
+-					onUpdate = { fragment ->
+-						rowsSupportFragment = fragment
+-					}
+-				)
+-			}
+-		}
+-	}
+-
+-	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+-		super.onViewCreated(view, savedInstanceState)
+-
+-		sessionRepository.currentSession
+-			.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+-			.map { session ->
+-				if (session == null) null
+-				else serverRepository.getServer(session.serverId)
+-			}
+-			.onEach { server ->
+-				notificationRepository.updateServerNotifications(server)
+-			}
+-			.launchIn(viewLifecycleOwner.lifecycleScope)
+-	}
++    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = content {
++        val user by users.currentUser.collectAsState()
++        var shelves by remember(user?.id) { mutableStateOf<List<Shelf>>(emptyList()) }
++        var error by remember(user?.id) { mutableStateOf<String?>(null) }
++        var loading by remember(user?.id) { mutableStateOf(true) }
++        var refresh by remember { mutableIntStateOf(0) }
++        var featured by remember(user?.id) { mutableStateOf<BaseItemDto?>(null) }
++        var focusedItem by remember(user?.id) { mutableStateOf<BaseItemDto?>(null) }
++        LaunchedEffect(focusedItem?.id) { delay(180); focusedItem?.let { featured = it } }
++        val startFocus = remember { FocusRequester() }
++        LaunchedEffect(user?.id, refresh) {
++            loading = true
++            error = null
++            try {
++                val result = coroutineScope {
++                    val libraries = async { api.userViewsApi.getUserViews().content.items }
++                    val resume = async { api.itemsApi.getResumeItems(limit = 20, fields = ItemRepository.browseFields).content.items }
++                    val latest = async { api.itemsApi.getItems(
++                        recursive = true, includeItemTypes = setOf(BaseItemKind.MOVIE, BaseItemKind.SERIES),
++                        sortBy = setOf(ItemSortBy.DATE_CREATED), sortOrder = setOf(SortOrder.DESCENDING),
++                        fields = ItemRepository.browseFields, limit = 30,
++                    ).content.items }
++                    listOf(Shelf("Continue watching", resume.await()), Shelf("Your libraries", libraries.await(), true), Shelf("Recently added", latest.await()))
++                }
++                shelves = result.filter { it.items.isNotEmpty() }
++                featured = result.firstOrNull { !it.library && it.items.isNotEmpty() }?.items?.firstOrNull()
++            } catch (cancel: CancellationException) { throw cancel }
++            catch (_: Exception) { error = "Couldn't load your library. Check the server connection and try again." }
++            finally { loading = false }
++        }
++        LaunchedEffect(Unit) { startFocus.requestFocus() }
++        JellyfinTheme {
++            Column(Modifier.fillMaxSize().background(Color(0xFF101114)).padding(horizontal = 24.dp, vertical = 12.dp)) {
++                MainToolbar(MainToolbarActiveButton.Home)
++                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
++                    Text("RENEGADEFIN", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFFFFAF45), letterSpacing = 3.sp)
++                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
++                        Button(onClick = { startActivity(Intent(requireContext(), ProfileActivity::class.java)) }, modifier = Modifier.focusRequester(startFocus)) { Text("Manage profiles") }
++                        Button(onClick = { refresh++ }) { Text("Refresh") }
++                    }
++                }
++                Spacer(Modifier.height(12.dp))
++                featured?.let { item ->
++                    Box(Modifier.fillMaxWidth().height(170.dp).clip(RoundedCornerShape(14.dp)).background(Color(0xFF1D2026))) {
++                        AsyncImage(model = item.itemBackdropImages.firstOrNull()?.getUrl(api, maxWidth = 1280), contentDescription = null,
++                            contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
++                        Box(Modifier.fillMaxSize().background(Brush.horizontalGradient(listOf(Color(0xFF101114), Color(0x44101114)))))
++                        Column(Modifier.padding(22.dp).fillMaxWidth(0.65f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
++                            Text(item.name.orEmpty(), fontSize = 26.sp, fontWeight = FontWeight.Bold, color = Color.White, maxLines = 1, overflow = TextOverflow.Ellipsis)
++                            Text(listOfNotNull(item.productionYear?.toString(), item.officialRating).joinToString("  •  "), color = Color(0xFFFFAF45))
++                            Text(item.overview.orEmpty().replace(Regex("<[^>]*>"), ""), color = Color(0xFFE1E1E4), maxLines = 2, overflow = TextOverflow.Ellipsis)
++                            Button(onClick = { navigation.navigate(Destinations.itemDetails(item.id)) }) { Text("View details / Play") }
++                        }
++                    }
++                }
++                if (loading) Text("Loading your library…", Modifier.padding(16.dp), color = Color.White)
++                error?.let { Text(it, Modifier.padding(16.dp), color = Color(0xFFFFAF45)) }
++                if (!loading && error == null && shelves.isEmpty()) Text("No media is available for this profile.", color = Color.White)
++                LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp), contentPadding = PaddingValues(vertical = 14.dp)) {
++                    items(shelves, key = { it.title }) { shelf ->
++                        Column {
++                            Text(shelf.title, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
++                            LazyRow(Modifier.focusRestorer().focusGroup(), horizontalArrangement = Arrangement.spacedBy(14.dp), contentPadding = PaddingValues(10.dp)) {
++                                items(shelf.items, key = { it.id.toString() }) { item ->
++                                    var focused by remember { mutableStateOf(false) }
++                                    Column(Modifier.width(if (shelf.library) 185.dp else 132.dp)
++                                        .graphicsLayer { scaleX = if (focused) 1.04f else 1f; scaleY = scaleX }
++                                        .onFocusChanged { focused = it.isFocused; if (focused && !shelf.library) focusedItem = item }
++                                        .clip(RoundedCornerShape(10.dp))
++                                        .background(if (focused) Color(0xFFFFAF45) else Color(0xFF20232A))
++                                        .clickable {
++                                            navigation.navigate(if (shelf.library) Destinations.libraryBrowser(item) else Destinations.itemDetails(item.id))
++                                        }) {
++                                        AsyncImage(model = item.itemImages[ImageType.PRIMARY]?.getUrl(api, maxWidth = 360),
++                                            contentDescription = null, contentScale = ContentScale.Crop,
++                                            modifier = Modifier.fillMaxWidth().height(if (shelf.library) 94.dp else 160.dp))
++                                        Text(item.name.orEmpty(), Modifier.padding(8.dp), color = if (focused) Color(0xFF101114) else Color.White,
++                                            fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
++                                    }
++                                }
++                            }
++                        }
++                    }
++                }
++            }
++        }
++    }
+ }
+diff --git a/app/src/main/java/org/jellyfin/androidtv/ui/renegade/ProfileActivity.kt b/app/src/main/java/org/jellyfin/androidtv/ui/renegade/ProfileActivity.kt
+new file mode 100644
+index 0000000..198fe82
+--- /dev/null
++++ b/app/src/main/java/org/jellyfin/androidtv/ui/renegade/ProfileActivity.kt
+@@ -0,0 +1,205 @@
++package org.jellyfin.androidtv.ui.renegade
++
++import android.app.AlertDialog
++import android.graphics.Color
++import android.graphics.drawable.GradientDrawable
++import android.os.Bundle
++import android.text.InputType
++import android.view.View
++import android.widget.*
++import androidx.activity.ComponentActivity
++import androidx.lifecycle.lifecycleScope
++import kotlinx.coroutines.CancellationException
++import kotlinx.coroutines.launch
++import org.jellyfin.androidtv.auth.repository.ServerRepository
++import org.jellyfin.androidtv.auth.repository.SessionRepository
++import org.jellyfin.androidtv.auth.repository.UserRepository
++import org.json.JSONArray
++import org.json.JSONObject
++import org.koin.android.ext.android.inject
++import java.util.UUID
++
++/** Large native controls and selectable tags, protected by fresh server authentication. */
++class ProfileActivity : ComponentActivity() {
++    private val sessions by inject<SessionRepository>()
++    private val servers by inject<ServerRepository>()
++    private val users by inject<UserRepository>()
++    private lateinit var column: LinearLayout
++    private lateinit var api: ProfileApi
++    private var working = false
++    private var unlocked = false
++    private var server = ""
++    private var status: TextView? = null
++    private val amber = Color.rgb(255, 175, 69)
++
++    override fun onCreate(savedInstanceState: Bundle?) {
++        super.onCreate(savedInstanceState)
++        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
++        page("Profiles")
++        if (users.currentUser.value?.policy?.isAdministrator != true) {
++            label("An administrator must sign in to create profiles or change restrictions. Use the profile icon on Home to switch accounts.")
++            action("Back") { finish() }
++            return
++        }
++        label("Confirm your administrator password to manage profiles. Changes apply on your Jellyfin server and other clients.")
++        val password = input("Administrator password", true)
++        action("Unlock profile settings") {
++            work {
++                val session = checkNotNull(sessions.currentSession.value)
++                server = checkNotNull(servers.getServer(session.serverId)).address
++                val bootstrap = ProfileApi(server, session.accessToken)
++                val result = JSONObject(bootstrap.request("Users/AuthenticateByName", JSONObject()
++                    .put("Username", checkNotNull(users.currentUser.value).name).put("Pw", password.text.toString())))
++                password.text.clear()
++                val verified = result.getJSONObject("User")
++                check(verified.getJSONObject("Policy").optBoolean("IsAdministrator") &&
++                    verified.getString("Id").replace("-", "") == session.userId.toString().replace("-", "")) { "Administrator confirmation failed." }
++                api = ProfileApi(server, result.getString("AccessToken"))
++                unlocked = true
++                showUsers()
++            }
++        }
++        action("Cancel") { finish() }
++    }
++
++    private fun page(title: String) {
++        column = LinearLayout(this).apply {
++            orientation = LinearLayout.VERTICAL
++            setPadding(dp(40), dp(24), dp(40), dp(24))
++            setBackgroundColor(Color.rgb(16, 17, 20))
++        }
++        setContentView(ScrollView(this).apply { isFillViewport = true; addView(column) })
++        label("RENEGADEFIN  /  $title", 24f, amber)
++        status = label("")
++    }
++    private fun label(text: String, size: Float = 18f, colour: Int = Color.WHITE): TextView = TextView(this).apply {
++        this.text = text; textSize = size; setTextColor(colour); setPadding(0, dp(8), 0, dp(8)); column.addView(this)
++    }
++    private fun action(title: String, click: () -> Unit): Button = Button(this).apply {
++        text = title; isAllCaps = false; textSize = 18f
++        minHeight = dp(54)
++        setTextColor(Color.WHITE)
++        background = surface(Color.rgb(35, 38, 45))
++        val layout = LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(8) }
++        column.addView(this, layout)
++        setOnFocusChangeListener { _, focused ->
++            background = surface(if (focused) amber else Color.rgb(35, 38, 45))
++            setTextColor(if (focused) Color.BLACK else Color.WHITE)
++        }
++        setOnClickListener { if (!working) click() }
++    }
++    private fun surface(colour: Int) = GradientDrawable().apply { setColor(colour); cornerRadius = dp(10).toFloat() }
++    private fun input(hint: String, secret: Boolean = false) = EditText(this).apply {
++        this.hint = hint; setTextColor(Color.WHITE); setHintTextColor(Color.LTGRAY); textSize = 20f; setSingleLine(true)
++        inputType = InputType.TYPE_CLASS_TEXT or if (secret) InputType.TYPE_TEXT_VARIATION_PASSWORD else InputType.TYPE_TEXT_VARIATION_NORMAL
++        column.addView(this, LinearLayout.LayoutParams(-1, dp(58)))
++    }
++    private fun work(block: suspend () -> Unit) {
++        if (working) return
++        working = true
++        status?.text = "Working…"
++        lifecycleScope.launch {
++            try { block(); status?.text = "" }
++            catch (cancel: CancellationException) { throw cancel }
++            catch (e: Exception) { status?.text = e.message ?: "Could not complete the request. Try again." }
++            finally { working = false }
++        }
++    }
++    private suspend fun showUsers() {
++        check(unlocked)
++        val profiles = JSONArray(api.request("Users")).objects()
++        page("Manage profiles")
++        label("Profiles use separate Jellyfin accounts, with their own history and favourites. Administrator accounts are protected from this editor.")
++        action("Create profile") { createForm() }
++        profiles.filter { !it.getJSONObject("Policy").optBoolean("IsAdministrator") }.forEach { profile ->
++            action(profile.getString("Name")) { work { edit(profile.getString("Id")) } }
++        }
++        action("Done") { finish() }
++    }
++    private fun createForm() {
++        page("Create profile")
++        val name = input("Profile name")
++        val password = input("Sign-in password", true)
++        label("A new profile starts disabled with no library access. Set restrictions, then choose Enable profile. Its password is also used in other Jellyfin apps.")
++        action("Create and set restrictions") {
++            if (name.text.isBlank() || password.text.length < 8) { status?.text = "Enter a name and a password of at least 8 characters."; return@action }
++            val chosenName = name.text.toString().trim()
++            val chosenPassword = password.text.toString()
++            work {
++                // An unguessable temporary password protects the creation-to-policy interval.
++                val created = JSONObject(api.request("Users/New", JSONObject().put("Name", chosenName).put("Password", UUID.randomUUID().toString())))
++                val id = created.getString("Id")
++                val policy = created.getJSONObject("Policy")
++                policy.put("IsDisabled", true).put("IsAdministrator", false).put("EnableAllFolders", false).put("EnabledFolders", JSONArray())
++                    .put("EnableContentDeletion", false).put("EnableRemoteControlOfOtherUsers", false)
++                api.request("Users/$id/Policy", policy)
++                api.request("Users/Password?userId=$id", JSONObject().put("NewPw", chosenPassword))
++                password.text.clear()
++                edit(id)
++            }
++        }
++        action("Cancel") { work { showUsers() } }
++    }
++    private suspend fun edit(id: String) {
++        val profile = api.user(id)
++        check(!profile.getJSONObject("Policy").optBoolean("IsAdministrator")) { "Administrator accounts cannot be edited here." }
++        val original = profile.getJSONObject("Policy")
++        val edited = JSONObject(original.toString())
++        val libraries = JSONArray(api.request("Library/VirtualFolders")).objects()
++        val ratings = JSONArray(api.request("Localization/ParentalRatings")).objects()
++        val filters = JSONObject(api.request("Items/Filters"))
++        val tags = (filters.optJSONArray("Tags") ?: JSONArray()).strings().sortedWith(String.CASE_INSENSITIVE_ORDER)
++        page(profile.getString("Name"))
++        label("Choose restrictions, review them, then save. These are server-enforced account settings.")
++        val enabled = CheckBox(this).apply { text = "Enable profile"; isChecked = !edited.optBoolean("IsDisabled"); setTextColor(Color.WHITE); textSize = 20f; column.addView(this) }
++        val all = CheckBox(this).apply { text = "Allow every library (including future libraries)"; isChecked = edited.optBoolean("EnableAllFolders"); setTextColor(Color.WHITE); textSize = 20f; column.addView(this) }
++        val selectedLibraries = (edited.optJSONArray("EnabledFolders") ?: JSONArray()).strings().toMutableSet()
++        val libraryButton = action("Choose allowed libraries") {
++            choose("Allowed libraries", libraries.map { it.optString("Name") to it.getString("ItemId") }, selectedLibraries) {}
++        }
++        all.setOnCheckedChangeListener { _, checked -> libraryButton.isEnabled = !checked }
++        libraryButton.isEnabled = !all.isChecked
++        var maxRating: Int? = if (edited.isNull("MaxParentalRating")) null else edited.getInt("MaxParentalRating")
++        val ratingButton = action("Age rating: ${maxRating?.toString() ?: "Unrestricted"}") {}
++        ratingButton.setOnClickListener {
++            if (!working) {
++                val choices = listOf("Unrestricted") + ratings.map { it.getString("Name") }
++                AlertDialog.Builder(this).setTitle("Maximum age rating").setItems(choices.toTypedArray()) { _, which ->
++                    maxRating = if (which == 0) null else ratings[which - 1].getInt("Value")
++                    ratingButton.text = "Age rating: ${choices[which]}"
++                }.setNegativeButton("Cancel", null).show()
++            }
++        }
++        val unrated = (edited.optJSONArray("BlockUnratedItems") ?: JSONArray()).strings().toMutableSet()
++        action("Choose unrated content to block") {
++            choose("Block unrated content", listOf("Movie", "Series", "Trailer", "Music", "Book", "LiveTvChannel", "Other").map { it to it }, unrated) {}
++        }
++        val allowed = (edited.optJSONArray("AllowedTags") ?: JSONArray()).strings().toMutableSet()
++        val blocked = (edited.optJSONArray("BlockedTags") ?: JSONArray()).strings().toMutableSet()
++        val tagOptions = (tags + allowed + blocked).distinct().sortedWith(String.CASE_INSENSITIVE_ORDER).map { it to it }
++        label("Allowed tags limit content to those tags. Blocked tags exclude content. Leave allowed tags empty for no tag allow-list.")
++        action("Choose allowed tags (${allowed.size})") { choose("Allowed tags", tagOptions, allowed) { blocked.removeAll(allowed) } }
++        action("Choose blocked tags (${blocked.size})") { choose("Blocked tags", tagOptions, blocked) { allowed.removeAll(blocked) } }
++        action("Review and save restrictions") {
++            edited.put("IsDisabled", !enabled.isChecked).put("EnableAllFolders", all.isChecked)
++                .put("EnabledFolders", JSONArray(selectedLibraries.toList())).put("MaxParentalRating", maxRating ?: JSONObject.NULL)
++                .put("AllowedTags", JSONArray(allowed.toList())).put("BlockedTags", JSONArray(blocked.toList()))
++                .put("BlockUnratedItems", JSONArray(unrated.toList()))
++            val summary = "Profile: ${profile.getString("Name")}\nEnabled: ${enabled.isChecked}\nLibraries: ${if (all.isChecked) "All" else selectedLibraries.size.toString()}\nMaximum rating: ${maxRating ?: "Unrestricted"}\nAllowed tags: ${allowed.joinToString().ifEmpty { "Any" }}\nBlocked tags: ${blocked.joinToString().ifEmpty { "None" }}\nUnrated blocked: ${unrated.joinToString().ifEmpty { "None" }}"
++            AlertDialog.Builder(this).setTitle("Confirm profile restrictions").setMessage(summary)
++                .setPositiveButton("Save") { _, _ -> work { api.savePolicy(id, original, edited); showUsers(); Toast.makeText(this, "Restrictions saved and verified", Toast.LENGTH_LONG).show() } }
++                .setNegativeButton("Cancel", null).show()
++        }
++        action("Discard changes") { work { showUsers() } }
++    }
++    private fun choose(title: String, options: List<Pair<String, String>>, selected: MutableSet<String>, changed: () -> Unit) {
++        if (options.isEmpty()) { AlertDialog.Builder(this).setMessage("No options are available on this server.").setPositiveButton("OK", null).show(); return }
++        val draft = selected.toMutableSet()
++        AlertDialog.Builder(this).setTitle(title)
++            .setMultiChoiceItems(options.map { it.first }.toTypedArray(), options.map { it.second in draft }.toBooleanArray()) { _, index, checked ->
++                if (checked) draft.add(options[index].second) else draft.remove(options[index].second)
++            }.setPositiveButton("Apply") { _, _ -> selected.clear(); selected.addAll(draft); changed() }
++            .setNegativeButton("Cancel", null).show()
++    }
++    private fun dp(value: Int) = (value * resources.displayMetrics.density).toInt()
++}
+diff --git a/app/src/main/java/org/jellyfin/androidtv/ui/renegade/ProfileApi.kt b/app/src/main/java/org/jellyfin/androidtv/ui/renegade/ProfileApi.kt
+new file mode 100644
+index 0000000..d5bf3c2
+--- /dev/null
++++ b/app/src/main/java/org/jellyfin/androidtv/ui/renegade/ProfileApi.kt
+@@ -0,0 +1,57 @@
++package org.jellyfin.androidtv.ui.renegade
++
++import kotlinx.coroutines.Dispatchers
++import kotlinx.coroutines.withContext
++import org.json.JSONArray
++import org.json.JSONObject
++import java.net.HttpURLConnection
++import java.net.URL
++
++/** Uses the server's user policies; restrictions are never only client-side filters. */
++class ProfileApi(private val server: String, private val token: String) {
++    suspend fun request(path: String, body: JSONObject? = null): String = withContext(Dispatchers.IO) {
++        val connection = URL(server.trimEnd('/') + "/" + path).openConnection() as HttpURLConnection
++        try {
++            connection.instanceFollowRedirects = false
++            connection.connectTimeout = 10000
++            connection.readTimeout = 15000
++            connection.setRequestProperty("Accept", "application/json")
++            connection.setRequestProperty("Authorization", "MediaBrowser Client=\"RenegadeFin\", Device=\"TV\", DeviceId=\"renegadefin-profile-management\", Version=\"0.2.0\", Token=\"$token\"")
++            if (body != null) {
++                connection.requestMethod = "POST"
++                connection.doOutput = true
++                connection.setRequestProperty("Content-Type", "application/json")
++                connection.outputStream.use { it.write(body.toString().toByteArray(Charsets.UTF_8)) }
++            }
++            val status = connection.responseCode
++            check(status in 200..299) {
++                when (status) {
++                    401, 403 -> "The server refused this action. Sign in again with an authorised administrator."
++                    409 -> "This profile changed on the server. Reopen it before saving."
++                    else -> "Server request failed ($status). No success has been confirmed."
++                }
++            }
++            connection.inputStream.bufferedReader().use { it.readText() }
++        } finally { connection.disconnect() }
++    }
++    suspend fun user(id: String) = JSONObject(request("Users/$id"))
++    suspend fun savePolicy(id: String, original: JSONObject, edited: JSONObject) {
++        val fresh = user(id).getJSONObject("Policy")
++        // Preserve unrelated permissions and reject concurrent edits to the fields we change.
++        for (key in fields) {
++            check(fresh.opt(key).toString() == original.opt(key).toString()) { "Restrictions changed elsewhere. Reopen this profile before saving." }
++            if (edited.has(key)) fresh.put(key, edited.get(key))
++        }
++        request("Users/$id/Policy", fresh)
++        val confirmed = user(id).getJSONObject("Policy")
++        for (key in fields) check(confirmed.opt(key).toString() == edited.opt(key).toString()) {
++            "The server did not confirm every restriction. Reopen the profile to check."
++        }
++    }
++    companion object {
++        val fields = listOf("EnableAllFolders", "EnabledFolders", "MaxParentalRating", "BlockedTags", "AllowedTags", "BlockUnratedItems", "IsDisabled")
++    }
++}
++
++fun JSONArray.strings(): List<String> = (0 until length()).map { getString(it) }
++fun JSONArray.objects(): List<JSONObject> = (0 until length()).map { getJSONObject(it) }
+diff --git a/app/src/main/res/drawable-nodpi/renegade_banner.png b/app/src/main/res/drawable-nodpi/renegade_banner.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..906e6c9b21d4ea0678917bf9b028aa4e69d3773e
+GIT binary patch
+literal 19454
+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
+
+literal 0
+HcmV?d00001
+
+diff --git a/app/src/main/res/drawable/renegade_icon.xml b/app/src/main/res/drawable/renegade_icon.xml
+new file mode 100644
+index 0000000..e5886fa
+--- /dev/null
++++ b/app/src/main/res/drawable/renegade_icon.xml
+@@ -0,0 +1,8 @@
++<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="108dp" android:height="108dp" android:viewportWidth="256" android:viewportHeight="256">
++ <path android:fillColor="#101114" android:pathData="M0,0H256V256H0Z"/>
++ <group android:scaleX="0.78" android:scaleY="0.78" android:translateX="28" android:translateY="24">
++ <path android:fillColor="#FF943D" android:pathData="M137,18C150,63 211,82 211,143C211,190 173,223 124,231L149,191C125,205 95,205 72,186C47,165 42,132 58,105L99,57L89,113C107,99 129,65 137,18Z"/>
++ <path android:fillColor="#101114" android:pathData="M116,108L172,143L101,172Z"/>
++ <path android:fillColor="#FFCC65" android:pathData="M49,218L86,207L69,237Z"/>
++ </group>
++</vector>
+diff --git a/app/src/main/res/values/colors.xml b/app/src/main/res/values/colors.xml
+index 54b5432..06ca61e 100644
+--- a/app/src/main/res/values/colors.xml
++++ b/app/src/main/res/values/colors.xml
+@@ -1,13 +1,13 @@
+ <resources>
+     <!-- Base Colors -->
+-    <color name="jellyfin_blue">#00a4dc</color>
+-    <color name="jellyfin_purple">#aa5cc3</color>
++    <color name="jellyfin_blue">#FF8735</color>
++    <color name="jellyfin_purple">#FFB849</color>
+     <color name="midnight_blue">#031A6B</color>
+     <color name="indigo_dye">#033860</color>
+     <color name="spanish_blue">#1E76BA</color>
+     <color name="grey">#303030</color>
+     <color name="grey_light">#4b4b4b</color>
+-    <color name="not_quite_black">#101010</color>
++    <color name="not_quite_black">#101114</color>
+     <color name="black">#000000</color>
+     <color name="white">#FFFFFF</color>
+     <color name="red">#CC3333</color>
+diff --git a/app/src/main/res/values/strings.xml b/app/src/main/res/values/strings.xml
+index 117ea54..82a7682 100644
+--- a/app/src/main/res/values/strings.xml
++++ b/app/src/main/res/values/strings.xml
+@@ -1,7 +1,7 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+-    <string name="app_name_release" translatable="false" tools:ignore="UnusedResources">Jellyfin</string>
+-    <string name="app_name_debug" translatable="false" tools:ignore="UnusedResources">Jellyfin Debug</string>
++    <string name="app_name_release" translatable="false" tools:ignore="UnusedResources">RenegadeFin</string>
++    <string name="app_name_debug" translatable="false" tools:ignore="UnusedResources">RenegadeFin Preview</string>
+     <string name="video_error_unknown_error">Failed to load video</string>
+     <string name="loading">Loading…</string>
+     <string name="btn_cancel">Cancel</string>
+diff --git a/design/renegadefin/README.md b/design/renegadefin/README.md
+new file mode 100644
+index 0000000..97f8bfb
+--- /dev/null
++++ b/design/renegadefin/README.md
+@@ -0,0 +1,9 @@
++# RenegadeFin identity
++
++An asymmetric flame curves into a fin; a cut-out play symbol links it to media. The detached spark gives the silhouette a rebellious, broken-boundary character. Orange #FF8735 and amber #FFB849 sit on charcoal #101114. This is original vector artwork, not the Jellyfin logo with a recolour.
++
++`logo.svg` is the scalable mark. `banner.svg` is the 640×360 TV launcher tile. The icon's safe inset and banner text avoid stretching a phone icon into a wide TV slot. Both source vectors remain editable.
++
++Native UI direction: featured artwork, horizontal shelves, limited animation, visible selected-card captions and warm focus fills. No animated background loops or autoplay trailers on entry-level Fire TV devices.
++
++Inspiration reviewed: https://jellywatch.app/player — native browsing, profiles and server-enforced user policies. This does not imply access to Jellywatch source or a partnership.
+diff --git a/design/renegadefin/banner.svg b/design/renegadefin/banner.svg
+new file mode 100644
+index 0000000..a6de570
+--- /dev/null
++++ b/design/renegadefin/banner.svg
+@@ -0,0 +1,8 @@
++<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
++ <defs><linearGradient id="fire" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#ff6035"/><stop offset="1" stop-color="#ffd166"/></linearGradient></defs>
++ <rect width="640" height="360" fill="#101114"/>
++ <path d="M430 0H640V360H315Z" fill="#1b1d23"/>
++ <g transform="translate(245 30) scale(.6)"><path fill="url(#fire)" d="M137 18C150 63 211 82 211 143C211 190 173 223 124 231L149 191C125 205 95 205 72 186C47 165 42 132 58 105L99 57L89 113C107 99 129 65 137 18Z"/><path fill="#101114" d="M116 108L172 143L101 172Z"/><path fill="#ffb849" d="M49 218L86 207L69 237Z"/></g>
++ <text x="320" y="232" text-anchor="middle" font-family="DejaVu Sans,sans-serif" font-weight="bold" font-size="47" fill="#ffffff">RENEGADE<tspan fill="#ffb849">FIN</tspan></text>
++ <text x="320" y="278" text-anchor="middle" font-family="DejaVu Sans,sans-serif" letter-spacing="5" font-size="15" fill="#c7c9cf">YOUR MEDIA. YOUR RULES.</text>
++</svg>
+diff --git a/design/renegadefin/logo.svg b/design/renegadefin/logo.svg
+new file mode 100644
+index 0000000..95e12b3
+--- /dev/null
++++ b/design/renegadefin/logo.svg
+@@ -0,0 +1,6 @@
++<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
++  <defs><linearGradient id="fire" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#ff6035"/><stop offset="1" stop-color="#ffd166"/></linearGradient></defs>
++  <path fill="url(#fire)" d="M137 18C150 63 211 82 211 143C211 190 173 223 124 231L149 191C125 205 95 205 72 186C47 165 42 132 58 105L99 57L89 113C107 99 129 65 137 18Z"/>
++  <path fill="#101114" d="M116 108L172 143L101 172Z"/>
++  <path fill="#ffb849" d="M49 218L86 207L69 237Z"/>
++</svg>
