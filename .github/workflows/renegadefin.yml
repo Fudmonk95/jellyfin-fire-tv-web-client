@@ -1,0 +1,27 @@
+name: RenegadeFin native build
+on:
+  push:
+    branches: [main, native-tv-rebuild]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+      - name: Compile and package
+        run: |
+          chmod +x gradlew
+          ./gradlew :app:assembleDebug -Pjellyfin.version=0.2.0-preview.1 --console=plain
+      - uses: actions/upload-artifact@v4
+        with:
+          name: renegadefin-preview
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error

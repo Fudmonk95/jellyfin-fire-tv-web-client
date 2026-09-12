@@ -21,10 +21,9 @@ jobs:
           git -C "$RUNNER_TEMP/native-source" apply --check "$RUNNER_TEMP/renegadefin.patch"
           git -C "$RUNNER_TEMP/native-source" apply "$RUNNER_TEMP/renegadefin.patch"
           rm -rf "$RUNNER_TEMP/native-source/.git" "$RUNNER_TEMP/native-source/.github"
-          git rm -r --ignore-unmatch .
+          git rm -r --ignore-unmatch -- . ':!.github'
           cp -a "$RUNNER_TEMP/native-source/." .
           mkdir -p .github/workflows
-          cp "$RUNNER_TEMP/renegadefin.yml" .github/workflows/renegadefin.yml
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add -A
