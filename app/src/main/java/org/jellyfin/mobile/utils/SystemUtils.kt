@@ -2,6 +2,8 @@ package org.jellyfin.mobile.utils
 
 import android.Manifest
 import android.app.Activity
+import android.app.UiModeManager
+import android.content.res.Configuration
 import android.app.ActivityManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -32,7 +34,14 @@ import timber.log.Timber
 import java.util.UUID
 import kotlin.coroutines.resume
 
+/** TV playback does not need the mobile screen-off battery exemption prompt. */
+val Context.isTelevision: Boolean
+    get() = getSystemService<UiModeManager>()?.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION ||
+        packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK) ||
+        packageManager.hasSystemFeature("amazon.hardware.fire_tv")
+
 fun WebViewFragment.requestNoBatteryOptimizations(rootView: CoordinatorLayout) {
+    if (requireContext().isTelevision) return
     val powerManager = requireContext().getSystemService(Activity.POWER_SERVICE) as PowerManager
     if (
         !appPreferences.ignoreBatteryOptimizations &&
