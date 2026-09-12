@@ -9,7 +9,14 @@ import java.net.URL
 
 /** Uses the server's user policies; restrictions are never only client-side filters. */
 class ProfileApi(private val server: String, private val token: String) {
-    suspend fun request(path: String, body: JSONObject? = null): String = withContext(Dispatchers.IO) {
+    suspend fun request(path: String, body: JSONObject? = null): String =
+        exchange(path, body?.toString()?.toByteArray(Charsets.UTF_8), "application/json")
+
+    suspend fun uploadAvatar(id: String, png: ByteArray) {
+        exchange("UserImage?userId=$id", android.util.Base64.encode(png, android.util.Base64.NO_WRAP), "image/png")
+    }
+
+    private suspend fun exchange(path: String, body: ByteArray?, contentType: String): String = withContext(Dispatchers.IO) {
         val connection = URL(server.trimEnd('/') + "/" + path).openConnection() as HttpURLConnection
         try {
             connection.instanceFollowRedirects = false
@@ -20,8 +27,8 @@ class ProfileApi(private val server: String, private val token: String) {
             if (body != null) {
                 connection.requestMethod = "POST"
                 connection.doOutput = true
-                connection.setRequestProperty("Content-Type", "application/json")
-                connection.outputStream.use { it.write(body.toString().toByteArray(Charsets.UTF_8)) }
+                connection.setRequestProperty("Content-Type", contentType)
+                connection.outputStream.use { it.write(body) }
             }
             val status = connection.responseCode
             check(status in 200..299) {
@@ -37,16 +44,24 @@ class ProfileApi(private val server: String, private val token: String) {
     suspend fun user(id: String) = JSONObject(request("Users/$id"))
     suspend fun savePolicy(id: String, original: JSONObject, edited: JSONObject) {
         val fresh = user(id).getJSONObject("Policy")
+        check(!fresh.optBoolean("IsAdministrator")) { "Administrator accounts cannot be edited here." }
         // Preserve unrelated permissions and reject concurrent edits to the fields we change.
         for (key in fields) {
-            check(fresh.opt(key).toString() == original.opt(key).toString()) { "Restrictions changed elsewhere. Reopen this profile before saving." }
+            check(equivalent(key, fresh.opt(key), original.opt(key))) { "Restrictions changed elsewhere. Reopen this profile before saving." }
             if (edited.has(key)) fresh.put(key, edited.get(key))
         }
         request("Users/$id/Policy", fresh)
         val confirmed = user(id).getJSONObject("Policy")
-        for (key in fields) check(confirmed.opt(key).toString() == edited.opt(key).toString()) {
+        for (key in fields) check(equivalent(key, confirmed.opt(key), edited.opt(key))) {
             "The server did not confirm every restriction. Reopen the profile to check."
         }
+    }
+    private fun equivalent(key: String, first: Any?, second: Any?): Boolean {
+        fun normal(value: Any?): String = when (value) {
+            is JSONArray -> value.strings().map { if (key == "EnabledFolders") it.replace("-", "").lowercase() else it }.sorted().joinToString("\u0000")
+            else -> value.toString()
+        }
+        return normal(first) == normal(second)
     }
     companion object {
         val fields = listOf("EnableAllFolders", "EnabledFolders", "MaxParentalRating", "BlockedTags", "AllowedTags", "BlockUnratedItems", "IsDisabled")

@@ -67,7 +67,7 @@ class AuthPreferencesScreen : OptionsFragment() {
 				}
 
 				depends {
-					!authenticationPreferences[AuthenticationPreferences.alwaysAuthenticate]
+					false // Automatic account entry is disabled in RenegadeFin.
 				}
 			}
 
@@ -95,19 +95,6 @@ class AuthPreferencesScreen : OptionsFragment() {
 			}
 		}
 
-		// Disallow changing the "always authenticate" option from the login screen
-		// because that would allow a kid to disable the function to access a parent's account
-		if (sessionRepository.currentSession.value != null) {
-			category {
-				setTitle(R.string.advanced_settings)
-
-				checkbox {
-					setTitle(R.string.always_authenticate)
-					setContent(R.string.always_authenticate_description)
-					bind(authenticationPreferences, AuthenticationPreferences.alwaysAuthenticate)
-				}
-			}
-		}
 
 		if (showAbout) aboutCategory()
 	}

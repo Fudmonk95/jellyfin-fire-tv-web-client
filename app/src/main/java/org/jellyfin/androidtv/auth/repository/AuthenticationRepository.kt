@@ -67,18 +67,7 @@ class AuthenticationRepositoryImpl(
 		}
 	}
 
-	private fun authenticateAutomatic(server: Server, user: User): Flow<LoginState> {
-		Timber.i("Authenticating user ${user.id}")
-
-		// Automatic logic is disabled when the always authenticate preference is enabled
-		if (authenticationPreferences[AuthenticationPreferences.alwaysAuthenticate]) return flowOf(RequireSignInState)
-
-		val authStoreUser = authenticationStore.getUser(server.id, user.id)
-		// Try login with access token
-		return if (authStoreUser?.accessToken != null) authenticateToken(server, user.withToken(authStoreUser.accessToken))
-		// Require login
-		else flowOf(RequireSignInState)
-	}
+	private fun authenticateAutomatic(server: Server, user: User): Flow<LoginState> = flowOf(RequireSignInState)
 
 	private fun authenticateCredential(server: Server, username: String, password: String) = flow {
 		val api = jellyfin.createApi(server.address, deviceInfo = defaultDeviceInfo.forUser(username))

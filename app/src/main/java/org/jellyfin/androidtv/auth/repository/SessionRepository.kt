@@ -69,7 +69,7 @@ class SessionRepositoryImpl(
 
 			_state.value = SessionRepositoryState.RESTORING_SESSION
 
-			val alwaysAuthenticate = authenticationPreferences[AuthenticationPreferences.alwaysAuthenticate]
+			val alwaysAuthenticate = true // RenegadeFin requires authentication when opening another profile.
 			val autoLoginBehavior = authenticationPreferences[AuthenticationPreferences.autoLoginUserBehavior]
 
 			when {

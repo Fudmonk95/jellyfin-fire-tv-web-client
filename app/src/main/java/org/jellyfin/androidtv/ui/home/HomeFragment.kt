@@ -46,6 +46,7 @@ import org.jellyfin.androidtv.util.apiclient.*
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.extensions.itemsApi
 import org.jellyfin.sdk.api.client.extensions.userViewsApi
+import org.jellyfin.sdk.api.client.extensions.tvShowsApi
 import org.jellyfin.sdk.model.api.*
 import org.koin.android.ext.android.inject
 
@@ -73,12 +74,13 @@ class HomeFragment : Fragment() {
                 val result = coroutineScope {
                     val libraries = async { api.userViewsApi.getUserViews().content.items }
                     val resume = async { api.itemsApi.getResumeItems(limit = 20, fields = ItemRepository.browseFields).content.items }
+                    val next = async { api.tvShowsApi.getNextUp(limit = 20, fields = ItemRepository.browseFields).content.items }
                     val latest = async { api.itemsApi.getItems(
                         recursive = true, includeItemTypes = setOf(BaseItemKind.MOVIE, BaseItemKind.SERIES),
                         sortBy = setOf(ItemSortBy.DATE_CREATED), sortOrder = setOf(SortOrder.DESCENDING),
                         fields = ItemRepository.browseFields, limit = 30,
                     ).content.items }
-                    listOf(Shelf("Continue watching", resume.await()), Shelf("Your libraries", libraries.await(), true), Shelf("Recently added", latest.await()))
+                    listOf(Shelf("Continue watching", resume.await()), Shelf("Next up", next.await()), Shelf("Your libraries", libraries.await(), true), Shelf("Recently added", latest.await()))
                 }
                 shelves = result.filter { it.items.isNotEmpty() }
                 featured = result.firstOrNull { !it.library && it.items.isNotEmpty() }?.items?.firstOrNull()

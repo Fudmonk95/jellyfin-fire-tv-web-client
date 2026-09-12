@@ -179,6 +179,9 @@ dependencies {
 	// Compatibility (desugaring)
 	coreLibraryDesugaring(libs.android.desugar)
 
+	// JVM implementation of JSON for profile policy HTTP regression tests.
+	testImplementation("org.json:json:20240303")
+
 	// Testing
 	testImplementation(libs.kotest.runner.junit5)
 	testImplementation(libs.kotest.assertions)

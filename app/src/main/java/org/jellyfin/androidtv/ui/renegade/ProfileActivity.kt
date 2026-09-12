@@ -2,6 +2,11 @@ package org.jellyfin.androidtv.ui.renegade
 
 import android.app.AlertDialog
 import android.graphics.Color
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Path
+import java.io.ByteArrayOutputStream
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.text.InputType
@@ -151,6 +156,7 @@ class ProfileActivity : ComponentActivity() {
         val tags = (filters.optJSONArray("Tags") ?: JSONArray()).strings().sortedWith(String.CASE_INSENSITIVE_ORDER)
         page(profile.getString("Name"))
         label("Choose restrictions, review them, then save. These are server-enforced account settings.")
+        action("Choose profile avatar") { avatarPicker(id) }
         val enabled = CheckBox(this).apply { text = "Enable profile"; isChecked = !edited.optBoolean("IsDisabled"); setTextColor(Color.WHITE); textSize = 20f; column.addView(this) }
         val all = CheckBox(this).apply { text = "Allow every library (including future libraries)"; isChecked = edited.optBoolean("EnableAllFolders"); setTextColor(Color.WHITE); textSize = 20f; column.addView(this) }
         val selectedLibraries = (edited.optJSONArray("EnabledFolders") ?: JSONArray()).strings().toMutableSet()
@@ -200,6 +206,46 @@ class ProfileActivity : ComponentActivity() {
                 if (checked) draft.add(options[index].second) else draft.remove(options[index].second)
             }.setPositiveButton("Apply") { _, _ -> selected.clear(); selected.addAll(draft); changed() }
             .setNegativeButton("Cancel", null).show()
+    }
+    private fun avatarPicker(id: String) {
+        val avatars = listOf("Blaze" to 0xFFFF8735.toInt(), "Tide" to 0xFF36BDE8.toInt(), "Forest" to 0xFF6CD49B.toInt(),
+            "Violet" to 0xFFC699FF.toInt(), "Gold" to 0xFFFFD166.toInt(), "Ice" to 0xFFE2F4FF.toInt())
+        val list = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(16), dp(8), dp(16), dp(8)) }
+        val dialog = AlertDialog.Builder(this).setTitle("Choose an avatar").setView(list).setNegativeButton("Cancel", null).create()
+        avatars.forEach { (name, colour) ->
+            val bitmap = Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+            canvas.drawColor(Color.rgb(16, 17, 20))
+            val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = colour }
+            val fin = Path().apply {
+                moveTo(137f, 18f); cubicTo(150f, 63f, 211f, 82f, 211f, 143f)
+                cubicTo(211f, 190f, 173f, 223f, 124f, 231f); lineTo(149f, 191f)
+                cubicTo(125f, 205f, 95f, 205f, 72f, 186f); cubicTo(47f, 165f, 42f, 132f, 58f, 105f)
+                lineTo(99f, 57f); lineTo(89f, 113f); cubicTo(107f, 99f, 129f, 65f, 137f, 18f); close()
+            }
+            canvas.drawPath(fin, paint)
+            paint.color = Color.rgb(16, 17, 20)
+            canvas.drawPath(Path().apply { moveTo(116f, 108f); lineTo(172f, 143f); lineTo(101f, 172f); close() }, paint)
+            val row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+            row.addView(ImageView(this).apply { setImageBitmap(bitmap) }, LinearLayout.LayoutParams(dp(48), dp(48)))
+            row.addView(Button(this).apply {
+                text = name; isAllCaps = false
+                setOnClickListener {
+                    if (!working) AlertDialog.Builder(this@ProfileActivity).setTitle("Use $name?")
+                        .setMessage("This changes the profile picture on your server.")
+                        .setPositiveButton("Use avatar") { _, _ ->
+                            dialog.dismiss()
+                            work {
+                                val bytes = ByteArrayOutputStream().use { out -> bitmap.compress(Bitmap.CompressFormat.PNG, 100, out); out.toByteArray() }
+                                api.uploadAvatar(id, bytes)
+                                Toast.makeText(this@ProfileActivity, "Avatar saved", Toast.LENGTH_SHORT).show()
+                            }
+                        }.setNegativeButton("Cancel", null).show()
+                }
+            }, LinearLayout.LayoutParams(-1, dp(48)))
+            list.addView(row)
+        }
+        dialog.show()
     }
     private fun dp(value: Int) = (value * resources.displayMetrics.density).toInt()
 }
