@@ -92,7 +92,15 @@ android {
 	}
 
 	testOptions.unitTests.all {
-		it.useJUnitPlatform()
+		it.useJUnitPlatform {
+            if (project.hasProperty("profileTests")) includeEngines("junit-jupiter")
+        }
+        it.testLogging {
+            exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+            showExceptions = true
+            showCauses = true
+            showStackTraces = true
+        }
 	}
 }
 
@@ -181,6 +189,7 @@ dependencies {
 
 	// JVM implementation of JSON for profile policy HTTP regression tests.
 	testImplementation("org.json:json:20240303")
+	testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
 	testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
 
 	// Testing

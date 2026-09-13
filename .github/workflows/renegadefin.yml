@@ -19,7 +19,7 @@ jobs:
       - name: Compile and package
         run: |
           chmod +x gradlew
-          ./gradlew :app:testDebugUnitTest --tests "*ProfileApiTests" :app:assembleDebug -Pjellyfin.version=0.2.0-preview.1 --console=plain
+          ./gradlew :app:testDebugUnitTest --tests "*ProfileApiTests" -PprofileTests :app:assembleDebug -Pjellyfin.version=0.2.0-preview.1 --console=plain
       - uses: actions/upload-artifact@v4
         with:
           name: renegadefin-preview
