@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -57,13 +58,40 @@ class HomeFragment : Fragment() {
     private val navigation by inject<NavigationRepository>()
     private data class Shelf(val title: String, val items: List<BaseItemDto>, val library: Boolean = false)
 
+    private var cachedUser: String? = null
+    private var cachedShelves: List<Shelf> = emptyList()
+    private var selectedShelf: String? = null
+    private var selectedItem: String? = null
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("renegade.user", cachedUser)
+        outState.putString("renegade.shelf", selectedShelf)
+        outState.putString("renegade.item", selectedItem)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        cachedUser = savedInstanceState?.getString("renegade.user") ?: cachedUser
+        selectedShelf = savedInstanceState?.getString("renegade.shelf") ?: selectedShelf
+        selectedItem = savedInstanceState?.getString("renegade.item") ?: selectedItem
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = content {
         val user by users.currentUser.collectAsState()
-        var shelves by remember(user?.id) { mutableStateOf<List<Shelf>>(emptyList()) }
+        var shelves by remember(user?.id) {
+            if (cachedUser != user?.id.toString()) {
+                cachedUser = user?.id.toString(); cachedShelves = emptyList(); selectedShelf = null; selectedItem = null
+            }
+            mutableStateOf(cachedShelves)
+        }
+        var restorePending by remember(user?.id) { mutableStateOf(selectedItem != null) }
         var error by remember(user?.id) { mutableStateOf<String?>(null) }
         var loading by remember(user?.id) { mutableStateOf(true) }
         var refresh by remember { mutableIntStateOf(0) }
-        var featured by remember(user?.id) { mutableStateOf<BaseItemDto?>(null) }
+        var featured by remember(user?.id) {
+            mutableStateOf(cachedShelves.filter { !it.library }.flatMap { it.items }.firstOrNull { it.id.toString() == selectedItem })
+        }
         var focusedItem by remember(user?.id) { mutableStateOf<BaseItemDto?>(null) }
         LaunchedEffect(focusedItem?.id) { delay(180); focusedItem?.let { featured = it } }
         val startFocus = remember { FocusRequester() }
@@ -83,7 +111,8 @@ class HomeFragment : Fragment() {
                     listOf(Shelf("Continue watching", resume.await()), Shelf("Next up", next.await()), Shelf("Your libraries", libraries.await(), true), Shelf("Recently added", latest.await()))
                 }
                 shelves = result.filter { it.items.isNotEmpty() }
-                featured = result.firstOrNull { !it.library && it.items.isNotEmpty() }?.items?.firstOrNull()
+                cachedShelves = shelves
+                if (featured == null) featured = result.firstOrNull { !it.library && it.items.isNotEmpty() }?.items?.firstOrNull()
             } catch (cancel: CancellationException) { throw cancel }
             catch (_: Exception) { error = "Couldn't load your library. Check the server connection and try again." }
             finally { loading = false }
@@ -116,16 +145,40 @@ class HomeFragment : Fragment() {
                 if (loading) Text("Loading your library…", Modifier.padding(16.dp), color = Color.White)
                 error?.let { Text(it, Modifier.padding(16.dp), color = Color(0xFFFFAF45)) }
                 if (!loading && error == null && shelves.isEmpty()) Text("No media is available for this profile.", color = Color.White)
-                LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp), contentPadding = PaddingValues(vertical = 14.dp)) {
+                val shelfState = rememberLazyListState(initialFirstVisibleItemIndex = shelves.indexOfFirst { it.title == selectedShelf }.coerceAtLeast(0))
+                LaunchedEffect(shelves) {
+                    if (restorePending) {
+                        val index = shelves.indexOfFirst { it.title == selectedShelf }
+                        if (index >= 0) shelfState.scrollToItem(index)
+                    }
+                }
+                LazyColumn(Modifier.weight(1f), state = shelfState, verticalArrangement = Arrangement.spacedBy(12.dp), contentPadding = PaddingValues(vertical = 14.dp)) {
                     items(shelves, key = { it.title }) { shelf ->
                         Column {
                             Text(shelf.title, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                            LazyRow(Modifier.focusRestorer().focusGroup(), horizontalArrangement = Arrangement.spacedBy(14.dp), contentPadding = PaddingValues(10.dp)) {
+                            val cardState = rememberLazyListState(initialFirstVisibleItemIndex =
+                                if (shelf.title == selectedShelf) (shelf.items.indexOfFirst { it.id.toString() == selectedItem } - 1).coerceAtLeast(0) else 0)
+                            LazyRow(Modifier.focusRestorer().focusGroup(), state = cardState, horizontalArrangement = Arrangement.spacedBy(14.dp), contentPadding = PaddingValues(10.dp)) {
                                 items(shelf.items, key = { it.id.toString() }) { item ->
                                     var focused by remember { mutableStateOf(false) }
+                                    val cardFocus = remember { FocusRequester() }
+                                    LaunchedEffect(restorePending, item.id) {
+                                        if (restorePending && item.id.toString() == selectedItem && shelf.title == selectedShelf) {
+                                            withFrameNanos { }
+                                            cardFocus.requestFocus()
+                                            restorePending = false
+                                        }
+                                    }
                                     Column(Modifier.width(if (shelf.library) 185.dp else 132.dp)
                                         .graphicsLayer { scaleX = if (focused) 1.04f else 1f; scaleY = scaleX }
-                                        .onFocusChanged { focused = it.isFocused; if (focused && !shelf.library) focusedItem = item }
+                                        .focusRequester(cardFocus)
+                                        .onFocusChanged {
+                                            focused = it.isFocused
+                                            if (focused) {
+                                                selectedShelf = shelf.title; selectedItem = item.id.toString()
+                                                if (!shelf.library) focusedItem = item
+                                            }
+                                        }
                                         .clip(RoundedCornerShape(10.dp))
                                         .background(if (focused) Color(0xFFFFAF45) else Color(0xFF20232A))
                                         .clickable {
