@@ -1,0 +1,42 @@
+name: Publish RenegadeFin preview
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/publish-renegadefin.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish verified native build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: Fudmonk95/jellyfin-fire-tv-web-client
+        run: |
+          gh run download 34775212935 --name renegadefin-preview --dir apk
+          python3 - <<'PY'
+          from pathlib import Path
+          import shutil
+          apks = list(Path("apk").rglob("*.apk"))
+          if len(apks) != 1:
+              raise RuntimeError("Expected exactly one verified APK")
+          shutil.copyfile(apks[0], "renegadefin-preview.apk")
+          PY
+          sha256sum renegadefin-preview.apk > SHA256SUMS.txt
+          cat > notes.md <<'EOF'
+          First native RenegadeFin preview, replacing the web wrapper approach.
+
+          Includes native home shelves, featured artwork, remembered card selection, orange/amber branding and an original Fire TV launcher banner. Native playback, search and library screens build on Jellyfin Android TV v0.19.10.
+
+          Home → Manage profiles lets an administrator confirm their password, create separate Jellyfin accounts, select avatars, libraries, age ratings, allowed/blocked tags and unrated content restrictions, then review and save. New profiles start disabled with no libraries; configure and enable them. Switching accounts requires authentication. Bonfire is not required.
+
+          Profiles in this preview are separate server accounts. Household sub-profiles, a separate short PIN, and a companion household plugin are not implemented. Web-only plugins and CSS are not supported. It is not universal plugin support.
+
+          Download renegadefin-preview.apk directly with Downloader. It installs alongside the previous wrapper and official Jellyfin. Debug signed preview: future signing changes may require reinstalling.
+
+          CI compiled the APK and ran the profile policy regression tests. Fire TV hardware, playback formats and end-to-end parental-control behaviour still require device/server testing. This is an experimental preview, not a stable replacement.
+          EOF
+          gh release create v0.2.0-preview.1 renegadefin-preview.apk SHA256SUMS.txt --target b4d110405b6ae4ef676880307298b8497e99f52a --prerelease --title "RenegadeFin — native TV preview" --notes-file notes.md
