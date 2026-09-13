@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -25,15 +26,12 @@ import org.jellyfin.androidtv.ui.composable.rememberCurrentTime
 
 @Composable
 fun Logo(modifier: Modifier = Modifier) {
-	Image(
-		painter = painterResource(R.drawable.app_logo),
-		contentDescription = stringResource(R.string.app_name),
-		modifier = modifier,
-	)
+	Text("RenegadeFin", modifier = modifier, fontSize = 22.sp, color = Color(0xFFFFAF45))
 }
 
 @Composable
 fun Toolbar(
+	compact: Boolean = false,
 	modifier: Modifier = Modifier,
 	start: @Composable () -> Unit = { Logo() },
 	center: @Composable () -> Unit = {},
@@ -41,8 +39,8 @@ fun Toolbar(
 ) {
 	ToolbarLayout(
 		modifier = modifier
-			.height(95.dp)
-			.overscan(),
+			.height(if (compact) 64.dp else 95.dp)
+			.then(if (compact) Modifier.padding(vertical = 8.dp) else Modifier.overscan()),
 		start = start,
 		center = center,
 		end = end,

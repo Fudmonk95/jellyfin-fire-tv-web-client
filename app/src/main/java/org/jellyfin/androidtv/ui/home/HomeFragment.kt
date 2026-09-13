@@ -120,7 +120,7 @@ class HomeFragment : Fragment() {
         LaunchedEffect(Unit) { startFocus.requestFocus() }
         JellyfinTheme {
             Column(Modifier.fillMaxSize().background(Color(0xFF101114)).padding(horizontal = 24.dp, vertical = 12.dp)) {
-                MainToolbar(MainToolbarActiveButton.Home)
+                MainToolbar(MainToolbarActiveButton.Home, compact = true)
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
                     Text("RENEGADEFIN", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFFFFAF45), letterSpacing = 3.sp)
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -130,14 +130,13 @@ class HomeFragment : Fragment() {
                 }
                 Spacer(Modifier.height(12.dp))
                 featured?.let { item ->
-                    Box(Modifier.fillMaxWidth().height(170.dp).clip(RoundedCornerShape(14.dp)).background(Color(0xFF1D2026))) {
+                    Box(Modifier.fillMaxWidth().height(140.dp).clip(RoundedCornerShape(14.dp)).background(Color(0xFF1D2026))) {
                         AsyncImage(model = item.itemBackdropImages.firstOrNull()?.getUrl(api, maxWidth = 1280), contentDescription = null,
                             contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
                         Box(Modifier.fillMaxSize().background(Brush.horizontalGradient(listOf(Color(0xFF101114), Color(0x44101114)))))
-                        Column(Modifier.padding(22.dp).fillMaxWidth(0.65f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Text(item.name.orEmpty(), fontSize = 26.sp, fontWeight = FontWeight.Bold, color = Color.White, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Column(Modifier.padding(12.dp).fillMaxWidth(0.65f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text(item.name.orEmpty(), fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.White, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             Text(listOfNotNull(item.productionYear?.toString(), item.officialRating).joinToString("  •  "), color = Color(0xFFFFAF45))
-                            Text(item.overview.orEmpty().replace(Regex("<[^>]*>"), ""), color = Color(0xFFE1E1E4), maxLines = 2, overflow = TextOverflow.Ellipsis)
                             Button(onClick = { navigation.navigate(Destinations.itemDetails(item.id)) }) { Text("View details / Play") }
                         }
                     }
@@ -169,7 +168,7 @@ class HomeFragment : Fragment() {
                                             restorePending = false
                                         }
                                     }
-                                    Column(Modifier.width(if (shelf.library) 185.dp else 132.dp)
+                                    Column(Modifier.width(if (shelf.library) 185.dp else 100.dp)
                                         .graphicsLayer { scaleX = if (focused) 1.04f else 1f; scaleY = scaleX }
                                         .focusRequester(cardFocus)
                                         .onFocusChanged {
@@ -186,7 +185,7 @@ class HomeFragment : Fragment() {
                                         }) {
                                         AsyncImage(model = item.itemImages[ImageType.PRIMARY]?.getUrl(api, maxWidth = 360),
                                             contentDescription = null, contentScale = ContentScale.Crop,
-                                            modifier = Modifier.fillMaxWidth().height(if (shelf.library) 94.dp else 160.dp))
+                                            modifier = Modifier.fillMaxWidth().height(if (shelf.library) 94.dp else 150.dp))
                                         Text(item.name.orEmpty(), Modifier.padding(8.dp), color = if (focused) Color(0xFF101114) else Color.White,
                                             fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                     }

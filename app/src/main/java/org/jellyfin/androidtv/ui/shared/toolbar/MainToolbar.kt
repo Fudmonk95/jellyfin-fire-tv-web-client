@@ -55,6 +55,7 @@ enum class MainToolbarActiveButton {
 @Composable
 fun MainToolbar(
 	activeButton: MainToolbarActiveButton = MainToolbarActiveButton.None,
+	compact: Boolean = false,
 ) {
 	val userRepository = koinInject<UserRepository>()
 	val api = koinInject<ApiClient>()
@@ -66,6 +67,7 @@ fun MainToolbar(
 	MainToolbar(
 		userImage = userImage,
 		activeButton = activeButton,
+		compact = compact,
 	)
 }
 
@@ -73,6 +75,7 @@ fun MainToolbar(
 private fun MainToolbar(
 	userImage: String? = null,
 	activeButton: MainToolbarActiveButton,
+	compact: Boolean,
 ) {
 	val focusRequester = remember { FocusRequester() }
 	val navigationRepository = koinInject<NavigationRepository>()
@@ -85,7 +88,7 @@ private fun MainToolbar(
 	)
 
 	Toolbar(
-		modifier = Modifier
+		compact = compact,		modifier = Modifier
 			.focusRestorer(focusRequester)
 			.focusGroup(),
 		start = {

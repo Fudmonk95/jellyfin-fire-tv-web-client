@@ -9,8 +9,8 @@ An experimental native Jellyfin client for Fire TV and Android TV. RenegadeFin r
 - Native Compose home with horizontal shelves, featured artwork, bounded image requests and D-pad selection.
 - Charcoal, orange and amber design; original fin/flame/play mark; 16:9 Fire TV banner.
 - Upstream native playback, search, library browsing, subtitles and audio controls.
-- Manage profiles from Home: fresh administrator password confirmation, create separate Jellyfin users, enable/disable profiles, choose libraries and age ratings, select allowed/blocked tags and unrated categories, review changes, and verify saved policies.
-- Profiles are real Jellyfin users with separate watch history and server-enforced permissions. Bonfire is not required. Sign-in uses Jellyfin's normal authentication; a profile password is not a separate local PIN.
+- Manage profiles from Home: fresh administrator password confirmation, create separate Jellyfin users, enable/disable profiles, choose libraries and age ratings, select an avatar, allowed/blocked tags and unrated categories, review changes, and verify saved policies.
+- Profiles are real Jellyfin users with separate watch history and server-enforced permissions. Bonfire is not required. Switching profiles always requires fresh sign-in (password or Quick Connect), including returning to a parent account. Sign-in uses Jellyfin's normal authentication; a profile password is not a separate local PIN.
 
 This is not yet household sub-profiles under one account. A companion plugin for household delegation and a separate PIN flow is future work. The native profile editor currently requires a Jellyfin administrator. Administrator accounts cannot be edited through it. New profiles start disabled with no library access until an administrator configures and enables them. If creation is interrupted, check the Users page in Jellyfin before retrying.
 
