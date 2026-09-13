@@ -181,6 +181,7 @@ dependencies {
 
 	// JVM implementation of JSON for profile policy HTTP regression tests.
 	testImplementation("org.json:json:20240303")
+	testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
 
 	// Testing
 	testImplementation(libs.kotest.runner.junit5)
