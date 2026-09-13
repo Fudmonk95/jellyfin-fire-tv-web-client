@@ -135,7 +135,7 @@ class ProfileActivity : ComponentActivity() {
                 val created = JSONObject(api.request("Users/New", JSONObject().put("Name", chosenName).put("Password", UUID.randomUUID().toString())))
                 val id = created.getString("Id")
                 val policy = created.getJSONObject("Policy")
-                policy.put("IsDisabled", true).put("IsAdministrator", false).put("EnableAllFolders", false).put("EnabledFolders", JSONArray())
+                policy.put("IsDisabled", true).put("IsHidden", false).put("IsAdministrator", false).put("EnableAllFolders", false).put("EnabledFolders", JSONArray())
                     .put("EnableContentDeletion", false).put("EnableRemoteControlOfOtherUsers", false)
                 api.request("Users/$id/Policy", policy)
                 api.request("Users/Password?userId=$id", JSONObject().put("NewPw", chosenPassword))
