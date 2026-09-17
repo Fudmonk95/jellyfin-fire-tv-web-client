@@ -36,16 +36,36 @@ class HomeSectionLoaderTests {
         val started = CompletableDeferred<Unit>()
         var published = false
         var cancelled = false
+        val callerThread = Thread.currentThread()
+        var cleanupThread: Thread? = null
         val job = launch {
             loadHomeSections(mapOf<String, suspend () -> Int>("Libraries" to {
                 started.complete(Unit)
-                try { awaitCancellation() } finally { cancelled = true }
+                try { awaitCancellation() } finally { cancelled = true; cleanupThread = Thread.currentThread() }
             })) { _, _ -> published = true }
         }
         started.await()
         job.cancelAndJoin()
         assertTrue(cancelled)
         assertFalse(published)
+        assertNotSame(callerThread, cleanupThread)
+    }
+
+    @Test
+    fun `network response processing stays off caller thread and results return to caller`() = runBlocking {
+        val callerThread = Thread.currentThread()
+        var delivered = false
+        loadHomeSections(mapOf<String, suspend () -> Int>("Libraries" to {
+            assertNotSame(callerThread, Thread.currentThread())
+            yield()
+            assertNotSame(callerThread, Thread.currentThread())
+            42
+        })) { _, result ->
+            assertSame(callerThread, Thread.currentThread())
+            assertEquals(42, result.getOrThrow())
+            delivered = true
+        }
+        assertTrue(delivered)
     }
 
     @Test

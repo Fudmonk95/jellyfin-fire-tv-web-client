@@ -1,5 +1,7 @@
 package org.jellyfin.androidtv.ui.home
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -16,7 +18,10 @@ internal suspend fun <T> loadHomeSections(
     requests.forEach { (name, request) ->
         launch {
             val result = try {
-                Result.success(request())
+                // The SDK reads and closes response bodies in the caller's context.
+                // Compose launches on Main: keep the complete request lifecycle on IO,
+                // including cancellation cleanup, and return only decoded data to Main.
+                Result.success(withContext(Dispatchers.IO) { request() })
             } catch (cancel: CancellationException) {
                 throw cancel
             } catch (failure: Exception) {

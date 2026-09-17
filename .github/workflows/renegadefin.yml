@@ -21,9 +21,46 @@ jobs:
       - name: Compile and package
         run: |
           chmod +x gradlew
-          ./gradlew :app:testDebugUnitTest --tests "*ProfileApiTests" --tests "*HomeSectionLoaderTests" -PprofileTests :app:assembleDebug -Pjellyfin.version=0.2.0-preview.2 --console=plain
+          ./gradlew :app:testDebugUnitTest --tests "*ProfileApiTests" --tests "*HomeSectionLoaderTests" -PprofileTests :app:assembleDebug -Pjellyfin.version=0.2.0-preview.3 --console=plain
       - uses: actions/upload-artifact@v4
         with:
           name: renegadefin-preview
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+  publish:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: renegadefin-preview
+          path: apk
+      - name: Publish tested crash fix
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import shutil
+          apks = list(Path("apk").rglob("*.apk"))
+          if len(apks) != 1:
+              raise RuntimeError("Expected exactly one APK")
+          shutil.copyfile(apks[0], "renegadefin-preview.apk")
+          PY
+          sha256sum renegadefin-preview.apk > SHA256SUMS.txt
+          cat > notes.md <<'EOF'
+          Fixes the home-screen request threading bug identified in a Fire TV crash report: NetworkOnMainThreadException during SDK response cancellation/close. Home requests, body decoding and cleanup now run on Dispatchers.IO; result delivery stays on the caller's UI context. Android's network-on-main-thread protection remains enabled.
+
+          Includes independent row loading and safe per-row errors from preview.2. Tests cover request thread placement, returning results to the caller, cancellation cleanup, partial row failure and profile policy preservation.
+
+          The APK compiles and automated tests pass before this release job runs. Fire TV testing is still needed to confirm loading and playback on your server. This is an experimental preview.
+
+          Download renegadefin-preview.apk. Debug signing may differ from the previous build: if installation reports a signature conflict, uninstall only the old RenegadeFin preview and install this APK, then sign in again.
+          EOF
+          gh release create v0.2.0-preview.3 renegadefin-preview.apk SHA256SUMS.txt --target "$SOURCE_SHA" --prerelease --title "RenegadeFin — Fire TV crash fix" --notes-file notes.md
