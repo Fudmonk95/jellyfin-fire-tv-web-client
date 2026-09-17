@@ -29,10 +29,7 @@ import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import androidx.fragment.compose.content
 import coil3.compose.AsyncImage
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.coroutineScope
 import org.jellyfin.androidtv.auth.repository.UserRepository
 import org.jellyfin.androidtv.data.repository.ItemRepository
 import org.jellyfin.androidtv.ui.base.JellyfinTheme
@@ -49,6 +46,7 @@ import org.jellyfin.sdk.api.client.extensions.itemsApi
 import org.jellyfin.sdk.api.client.extensions.userViewsApi
 import org.jellyfin.sdk.api.client.extensions.tvShowsApi
 import org.jellyfin.sdk.model.api.*
+import timber.log.Timber
 import org.koin.android.ext.android.inject
 
 /** Native, bounded home shelves. No WebView, injected CSS, or DOM focus scans. */
@@ -96,26 +94,40 @@ class HomeFragment : Fragment() {
         LaunchedEffect(focusedItem?.id) { delay(180); focusedItem?.let { featured = it } }
         val startFocus = remember { FocusRequester() }
         LaunchedEffect(user?.id, refresh) {
+            if (user == null) { loading = false; return@LaunchedEffect }
             loading = true
             error = null
+            // Never retain stale rows after a failed refresh (permissions may have changed).
+            shelves = emptyList()
+            cachedShelves = emptyList()
+            featured = null
+            focusedItem = null
+            val results = linkedMapOf<String, Shelf>()
+            val failures = linkedMapOf<String, String>()
+            val order = listOf("Continue watching", "Next up", "Your libraries", "Recently added")
             try {
-                val result = coroutineScope {
-                    val libraries = async { api.userViewsApi.getUserViews().content.items }
-                    val resume = async { api.itemsApi.getResumeItems(limit = 20, fields = ItemRepository.browseFields).content.items }
-                    val next = async { api.tvShowsApi.getNextUp(limit = 20, fields = ItemRepository.browseFields).content.items }
-                    val latest = async { api.itemsApi.getItems(
+                loadHomeSections(linkedMapOf<String, suspend () -> Shelf>(
+                    "Continue watching" to { Shelf("Continue watching", api.itemsApi.getResumeItems(limit = 20, fields = ItemRepository.browseFields).content.items) },
+                    "Next up" to { Shelf("Next up", api.tvShowsApi.getNextUp(limit = 20, fields = ItemRepository.browseFields).content.items) },
+                    "Your libraries" to { Shelf("Your libraries", api.userViewsApi.getUserViews().content.items, true) },
+                    "Recently added" to { Shelf("Recently added", api.itemsApi.getItems(
                         recursive = true, includeItemTypes = setOf(BaseItemKind.MOVIE, BaseItemKind.SERIES),
                         sortBy = setOf(ItemSortBy.DATE_CREATED), sortOrder = setOf(SortOrder.DESCENDING),
                         fields = ItemRepository.browseFields, limit = 30,
-                    ).content.items }
-                    listOf(Shelf("Continue watching", resume.await()), Shelf("Next up", next.await()), Shelf("Your libraries", libraries.await(), true), Shelf("Recently added", latest.await()))
+                    ).content.items) },
+                )) { title, result ->
+                    result.fold(onSuccess = { results[title] = it }, onFailure = { failure ->
+                        val reason = homeFailureReason(failure)
+                        failures[title] = reason
+                        // Do not log response bodies, URLs, tokens, or exception messages.
+                        Timber.w("Home section %s failed: %s (%s)", title, reason, failure.javaClass.simpleName)
+                    })
+                    shelves = order.mapNotNull { results[it] }.filter { it.items.isNotEmpty() }
+                    cachedShelves = shelves
+                    if (featured == null) featured = shelves.firstOrNull { !it.library }?.items?.firstOrNull()
+                    error = failures.takeIf { it.isNotEmpty() }?.entries?.joinToString(" • ") { "${it.key}: ${it.value}" }
                 }
-                shelves = result.filter { it.items.isNotEmpty() }
-                cachedShelves = shelves
-                if (featured == null) featured = result.firstOrNull { !it.library && it.items.isNotEmpty() }?.items?.firstOrNull()
-            } catch (cancel: CancellationException) { throw cancel }
-            catch (_: Exception) { error = "Couldn't load your library. Check the server connection and try again." }
-            finally { loading = false }
+            } finally { loading = false }
         }
         LaunchedEffect(Unit) { startFocus.requestFocus() }
         JellyfinTheme {
@@ -142,7 +154,7 @@ class HomeFragment : Fragment() {
                     }
                 }
                 if (loading) Text("Loading your library…", Modifier.padding(16.dp), color = Color.White)
-                error?.let { Text(it, Modifier.padding(16.dp), color = Color(0xFFFFAF45)) }
+                error?.let { Text(it, Modifier.padding(12.dp), color = Color(0xFFFFAF45), maxLines = 3, overflow = TextOverflow.Ellipsis) }
                 if (!loading && error == null && shelves.isEmpty()) Text("No media is available for this profile.", color = Color.White)
                 val shelfState = rememberLazyListState(initialFirstVisibleItemIndex = shelves.indexOfFirst { it.title == selectedShelf }.coerceAtLeast(0))
                 LaunchedEffect(shelves) {
